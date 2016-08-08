@@ -26,11 +26,19 @@
 
     <properties>
         <junit.version>4.11</junit.version>
-        <lwjgl.version>2.9.2</lwjgl.version>
+        <!--
+             LWJGL 2.9.1 is the last version compatible with Java 5
+             but it has a bug that loads wrong OpenAL version on 64bit JVM.
+             https://github.com/kovertopz/Paulscode-SoundSystem/issues/1
+
+             You probably want to ship your application with 2.9.3, and provide the download link of 2.9.1:
+             https://sourceforge.net/projects/java-game-lib/files/Official%20Releases/LWJGL%202.9.1/lwjgl-2.9.1.zip/download
+        -->
+        <lwjgl.version>2.9.1</lwjgl.version>
         <mavencompiler.version>2.5.1</mavencompiler.version>
         <mavenjavadoc.version>2.10.1</mavenjavadoc.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.5</maven.compiler.source>
+        <maven.compiler.target>1.5</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
