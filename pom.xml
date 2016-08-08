@@ -5,7 +5,7 @@
 
     <groupId>com.paulscode</groupId>
     <artifactId>Paulscode-SoundSystem</artifactId>
-    <version>2013.04.17</version>
+    <version>2013.04.17-legacy</version>
     <inceptionYear>2014</inceptionYear>
     <packaging>jar</packaging>
 
@@ -19,9 +19,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/kovertopz/Paulscode-SoundSystem.git</connection>
-        <developerConnection>scm:git:git@github.com:kovertopz/Paulscode-SoundSystem.git</developerConnection>
-        <url>https://github.com/kovertopz/Paulscode-SoundSystem</url>
+        <connection>scm:git:git://github.com/NullNoname/Paulscode-SoundSystem.git</connection>
+        <developerConnection>scm:git:git@github.com:NullNoname/Paulscode-SoundSystem.git</developerConnection>
+        <url>https://github.com/NullNoname/Paulscode-SoundSystem</url>
     </scm>
 
     <properties>
