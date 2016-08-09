@@ -53,6 +53,11 @@
             <artifactId>lwjgl_util</artifactId>
             <version>${lwjgl.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jcraft</groupId>
+            <artifactId>jorbis</artifactId>
+            <version>0.0.17</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
