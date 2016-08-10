@@ -9,6 +9,13 @@
     <inceptionYear>2014</inceptionYear>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <developers>
         <developer>
             <id>kovertopz</id>
@@ -54,7 +61,7 @@
             <version>${lwjgl.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jcraft</groupId>
+            <groupId>com.github.NullNoname</groupId>
             <artifactId>jorbis</artifactId>
             <version>0.0.17</version>
         </dependency>
