@@ -50,6 +50,7 @@
     </properties>
 
     <dependencies>
+        <!-- The following libraries are available in Maven Central -->
         <dependency>
             <groupId>org.lwjgl.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
@@ -66,6 +67,16 @@
             <groupId>de.jarnbjo</groupId>
             <artifactId>j-ogg-all</artifactId>
             <version>1.0.0</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- The following libraries are pulled from JitPack -->
+
+        <!-- https://github.com/NullNoname/micromod -->
+        <dependency>
+            <groupId>com.github.NullNoname</groupId>
+            <artifactId>micromod</artifactId>
+            <version>a51</version>
             <optional>true</optional>
         </dependency>
 
