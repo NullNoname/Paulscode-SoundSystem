@@ -49,6 +49,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+	<profiles>
+	  <profile>
+		<!-- Disable strict Javadoc check on Java 8 (http://stackoverflow.com/a/26806103) -->
+		<id>doclint-java8-disable</id>
+		<activation>
+		  <jdk>[1.8,)</jdk>
+		</activation>
+		<properties>
+		  <javadoc.opts>-Xdoclint:none</javadoc.opts>
+		</properties>
+	  </profile>
+	</profiles>
+
     <dependencies>
         <!-- The following libraries are available in Maven Central -->
         <dependency>
@@ -132,6 +145,8 @@
 					</additionalJOptions>
 					<!-- This is needed because the Javadoc has full of errors, like missing end tags -->
 					<failOnError>false</failOnError>
+					<!-- Disable strict Javadoc check on Java 8 (http://stackoverflow.com/a/26806103) -->
+					<additionalparam>${javadoc.opts}</additionalparam>
 				</configuration>
 				<executions>
 					<execution>
