@@ -76,6 +76,14 @@
             <version>0.0.17</version>
             <optional>true</optional>
         </dependency>
+
+        <!-- https://github.com/SourceUtils/jspeex -->
+        <dependency>
+            <groupId>com.github.SourceUtils</groupId>
+            <artifactId>jspeex</artifactId>
+            <version>b7f6f864f0</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
