@@ -54,23 +54,27 @@
             <groupId>org.lwjgl.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
             <version>${lwjgl.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.lwjgl.lwjgl</groupId>
             <artifactId>lwjgl_util</artifactId>
             <version>${lwjgl.version}</version>
+            <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>de.jarnbjo</groupId>
+            <artifactId>j-ogg-all</artifactId>
+            <version>1.0.0</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- https://github.com/NullNoname/jorbis -->
         <dependency>
             <groupId>com.github.NullNoname</groupId>
             <artifactId>jorbis</artifactId>
             <version>0.0.17</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
