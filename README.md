@@ -1,4 +1,6 @@
 # PaulsCode 3D Sound System
+[![](https://jitpack.io/v/NullNoname/Paulscode-SoundSystem.svg)](https://jitpack.io/#NullNoname/Paulscode-SoundSystem)
+
 This repository is an unofficial mirror of [Paul Lamb's 3D Sound System](http://www.paulscode.com/forum/index.php?topic=4.0).
 Most optional components except JOAL and jPCT-related codes are included.
 
