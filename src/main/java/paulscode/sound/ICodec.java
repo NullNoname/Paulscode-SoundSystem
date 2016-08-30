@@ -1,7 +1,7 @@
 package paulscode.sound;
 
 import java.net.URL;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 /**
  * The ICodec interface provides a common interface for SoundSystem to use
@@ -58,7 +58,7 @@ public interface ICodec
  * @param b True if the calling audio library requires byte-reversal by some codec libraries.
  */
     public void reverseByteOrder( boolean b );
-    
+
 /**
  * Should make any preperations required before reading from the audio stream.
  * If another stream is already opened, it should be closed and a new audio
@@ -115,5 +115,5 @@ public interface ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat();
+    public PAudioFormat getAudioFormat();
 }

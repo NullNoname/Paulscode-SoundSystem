@@ -1,6 +1,6 @@
 package paulscode.sound;
 
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 /**
  * The SoundBuffer class is used to wrap audio data along with the format in
@@ -47,7 +47,7 @@ public class SoundBuffer
 /**
  * The audio format in which the data is stored.
  */
-    public AudioFormat audioFormat;
+    public PAudioFormat audioFormat;
 
 /**
  * Constructor: Wraps the specified data with the specified audio format.
@@ -55,12 +55,12 @@ public class SoundBuffer
  * @param audioData The actual audio data.
  * @param audioFormat The audio format in which the data is stored.
  */
-    public SoundBuffer( byte[] audioData, AudioFormat audioFormat )
+    public SoundBuffer( byte[] audioData, PAudioFormat audioFormat )
     {
         this.audioData = audioData;
         this.audioFormat = audioFormat;
     }
-    
+
 /**
  * Removes handles to all instantiated objects.
  */

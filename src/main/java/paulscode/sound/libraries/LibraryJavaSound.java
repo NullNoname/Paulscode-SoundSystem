@@ -18,6 +18,8 @@ import paulscode.sound.Channel;
 import paulscode.sound.FilenameURL;
 import paulscode.sound.ICodec;
 import paulscode.sound.Library;
+import paulscode.sound.PAudioFormat;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.Source;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystem;
@@ -25,9 +27,9 @@ import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
 
 /**
- * The LibraryJavaSound class interfaces the JavaSound library.  
- * For more information about the JavaSound API, visit 
- * http://java.sun.com/products/java-media/sound/ 
+ * The LibraryJavaSound class interfaces the JavaSound library.
+ * For more information about the JavaSound API, visit
+ * http://java.sun.com/products/java-media/sound/
  *<br><br>
  *<b><i>    SoundSystem LibraryJavaSound License:</b></i><br><b><br>
  *    You are free to use this library for any purpose, commercial or otherwise.
@@ -83,7 +85,7 @@ public class LibraryJavaSound extends Library
  * The maximum safe size for a JavaSound clip.
  */
     private final int maxClipSize = 1048576;
-    
+
 /**
  * Mixes all the playing sources.
  */
@@ -129,10 +131,10 @@ public class LibraryJavaSound extends Library
  */
     private static boolean useSampleRateControl = true;
 
-    
+
 /**
- * Constructor: Instantiates the source map, buffer map and listener 
- * information.  Also sets the library type to 
+ * Constructor: Instantiates the source map, buffer map and listener
+ * information.  Also sets the library type to
  * SoundSystemConfig.LIBRARY_JAVASOUND
  */
     public LibraryJavaSound() throws SoundSystemException
@@ -140,7 +142,7 @@ public class LibraryJavaSound extends Library
         super();
         instance = this;
     }
-    
+
  /**
  * Initializes Javasound.
  */
@@ -216,10 +218,10 @@ public class LibraryJavaSound extends Library
 
         // Start out at full volume:
         setMasterVolume( 1.0f );
-        
+
         // Let the user know if everything is ok:
         message( "JavaSound initialized." );
-        
+
         super.init();
     }
 
@@ -239,8 +241,8 @@ public class LibraryJavaSound extends Library
     }
 
 /**
- * Creates a new channel of the specified type (normal or streaming).  Possible 
- * values for channel type can be found in the 
+ * Creates a new channel of the specified type (normal or streaming).  Possible
+ * values for channel type can be found in the
  * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
  * @param type Type of channel.
  */
@@ -249,7 +251,7 @@ public class LibraryJavaSound extends Library
     {
         return new ChannelJavaSound( type, myMixer );
     }
-    
+
 /**
  * Stops all sources, and removes references to all instantiated objects.
  */
@@ -261,7 +263,7 @@ public class LibraryJavaSound extends Library
         myMixer = null;
         myMixerRanking = null;
     }
-    
+
 /**
  * Pre-loads a sound into memory.
  * @param filenameURL Filename/URL of a sound file to load.
@@ -276,16 +278,16 @@ public class LibraryJavaSound extends Library
             bufferMap = new HashMap<String, SoundBuffer>();
             importantMessage( "Buffer Map was null in method 'loadSound'" );
         }
-        
+
         // make sure they gave us a filename:
         if( errorCheck( filenameURL == null,
                           "Filename/URL not specified in method 'loadSound'" ) )
             return false;
-        
-        // check if it is already loaded:        
+
+        // check if it is already loaded:
         if( bufferMap.get( filenameURL.getFilename() ) != null )
             return true;
-        
+
         ICodec codec = SoundSystemConfig.getCodec( filenameURL.getFilename() );
         if( errorCheck( codec == null, "No codec found for file '" +
                                        filenameURL.getFilename() +
@@ -306,7 +308,7 @@ public class LibraryJavaSound extends Library
             bufferMap.put( filenameURL.getFilename(), buffer );
         else
             errorMessage( "Sound buffer null in method 'loadSound'" );
-        
+
         return true;
     }
 
@@ -345,21 +347,21 @@ public class LibraryJavaSound extends Library
 
         return true;
     }
-    
+
  /**
  * Sets the overall volume to the specified value, affecting all sources.
  * @param value New volume, float value ( 0.0f - 1.0f ).
- */ 
+ */
     @Override
     public void setMasterVolume( float value )
     {
         super.setMasterVolume( value );
-        
+
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // loop through and update the volume of all sources:
         while( iter.hasNext() )
         {
@@ -369,7 +371,7 @@ public class LibraryJavaSound extends Library
                 source.positionChanged();
         }
     }
-    
+
 /**
  * Creates a new source and places it into the source map.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -389,7 +391,7 @@ public class LibraryJavaSound extends Library
                            float y, float z, int attModel, float distOrRoll )
     {
         SoundBuffer buffer = null;
-        
+
         if( !toStream )
         {
             // Grab the audio data for this file:
@@ -416,10 +418,10 @@ public class LibraryJavaSound extends Library
                 return;
             }
         }
-        
+
         if( !toStream && buffer != null )
             buffer.trimData( maxClipSize );
-        
+
         sourceMap.put( sourcename,
                        new SourceJavaSound( listener, priority, toStream,
                                             toLoop, sourcename, filenameURL,
@@ -439,16 +441,16 @@ public class LibraryJavaSound extends Library
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  */
     @Override
-    public void rawDataStream( AudioFormat audioFormat, boolean priority,
+    public void rawDataStream( PAudioFormat audioFormat, boolean priority,
                                String sourcename, float x, float y,
                                float z, int attModel, float distOrRoll )
     {
         sourceMap.put( sourcename,
-                       new SourceJavaSound( listener, audioFormat, priority,
+                       new SourceJavaSound( listener, AudioFormatConverter.convertAudioFormat(audioFormat), priority,
                                             sourcename, x, y, z, attModel,
                                             distOrRoll ) );
     }
-    
+
 /**
  * Creates and immediately plays a new source.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -470,7 +472,7 @@ public class LibraryJavaSound extends Library
                            boolean temporary )
     {
         SoundBuffer buffer = null;
-        
+
         if( !toStream )
         {
             // Grab the audio data for this file:
@@ -497,17 +499,17 @@ public class LibraryJavaSound extends Library
                 return;
             }
         }
-        
+
         if( !toStream && buffer != null)
             buffer.trimData( maxClipSize );
-        
+
         sourceMap.put( sourcename,
                        new SourceJavaSound( listener, priority, toStream,
                                             toLoop, sourcename, filenameURL,
                                             buffer, x, y, z, attModel,
                                             distOrRoll, temporary ) );
     }
-    
+
 /**
  * Creates sources based on the source map provided.
  * @param srcMap Sources to copy.
@@ -518,20 +520,20 @@ public class LibraryJavaSound extends Library
         if( srcMap == null )
             return;
         Set<String> keys = srcMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // Make sure the buffer map exists:
         if( bufferMap == null )
         {
             bufferMap = new HashMap<String, SoundBuffer>();
             importantMessage( "Buffer Map was null in method 'copySources'" );
         }
-        
+
         // remove any existing sources before starting:
         sourceMap.clear();
-        
+
         SoundBuffer buffer;
         // loop through and copy all the sources:
         while( iter.hasNext() )
@@ -572,7 +574,7 @@ public class LibraryJavaSound extends Library
 
         listenerMoved();
     }
-    
+
 /**
  * The Doppler parameters have changed.
  */
@@ -666,7 +668,7 @@ public class LibraryJavaSound extends Library
             myMixerRanking = value;
         return myMixerRanking;
     }
-    
+
     public static void setMinSampleRate( int value )
     {
         minSampleRate( SET, value );
@@ -730,7 +732,7 @@ public class LibraryJavaSound extends Library
             useSampleRateControl = value;
         return useSampleRateControl;
     }
-    
+
 /**
  * Returns the short title of this library type.
  * @return A short title.
@@ -936,7 +938,7 @@ public class LibraryJavaSound extends Library
                 throw new LibraryJavaSound.Exception( "Unable to acquire the " +
                        "specified Mixer in method 'MixerRanking.rank'" , this );
             mixerExists = true;
-            
+
             // STEP 2: Check if the desired sample-rate range is possible
             AudioFormat format;
             DataLine.Info lineInfo;
@@ -1242,6 +1244,6 @@ public class LibraryJavaSound extends Library
             super( message, MIXER_PROBLEM );
             mixerRanking = rank;
         }
-        
+
     }
 }

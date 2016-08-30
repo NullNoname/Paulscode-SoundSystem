@@ -3,7 +3,6 @@ package paulscode.sound.libraries;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
-import javax.sound.sampled.AudioFormat;
 
 // From the lwjgl library, http://www.lwjgl.org
 import org.lwjgl.BufferUtils;
@@ -11,11 +10,12 @@ import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 
 import paulscode.sound.Channel;
+import paulscode.sound.PAudioFormat;
 import paulscode.sound.SoundSystemConfig;
 
 /**
  * The ChannelLWJGLOpenAL class is used to reserve a sound-card voice using the
- * lwjgl binding of OpenAL.  Channels can be either normal or streaming 
+ * lwjgl binding of OpenAL.  Channels can be either normal or streaming
  * channels.
  *<b><br><br>
  *    This software is based on or using the LWJGL Lightweight Java Gaming
@@ -93,18 +93,18 @@ public class ChannelLWJGLOpenAL extends Channel
 {
 /**
  * OpenAL's IntBuffer identifier for this channel.
- */    
+ */
     public IntBuffer ALSource;
-    
+
 /**
  * OpenAL data format to use when playing back the assigned source.
- */    
+ */
     public int ALformat;	// OpenAL data format
-    
+
 /**
  * Sample rate (speed) to use for play-back.
- */    
-    public int sampleRate;	// sample rate        
+ */
+    public int sampleRate;	// sample rate
 
 /**
  * Miliseconds of buffers previously played (streaming sources).
@@ -112,9 +112,9 @@ public class ChannelLWJGLOpenAL extends Channel
     public float millisPreviouslyPlayed = 0;
 
 /**
- * Constructor:  takes channelType identifier and a handle to the OpenAL 
- * IntBuffer identifier to use for this channel.  Possible values for channel 
- * type can be found in the 
+ * Constructor:  takes channelType identifier and a handle to the OpenAL
+ * IntBuffer identifier to use for this channel.  Possible values for channel
+ * type can be found in the
  * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
  * @param type Type of channel (normal or streaming).
  * @param src Handle to the OpenAL source identifier.
@@ -125,9 +125,9 @@ public class ChannelLWJGLOpenAL extends Channel
         libraryType = LibraryLWJGLOpenAL.class;
         ALSource = src;
     }
-    
+
 /**
- * Empties the streamBuffers list, stops and deletes the ALSource, shuts the 
+ * Empties the streamBuffers list, stops and deletes the ALSource, shuts the
  * channel down, and removes references to all instantiated objects.
  */
     @Override
@@ -154,12 +154,12 @@ public class ChannelLWJGLOpenAL extends Channel
             ALSource.clear();
         }
         ALSource = null;
-        
+
         super.cleanup();
     }
-    
+
 /**
- * Attaches an OpenAL sound-buffer identifier for the sound data to be played 
+ * Attaches an OpenAL sound-buffer identifier for the sound data to be played
  * back for a normal source.
  * @param buf Intbuffer identifier for the sound data to play.
  * @return False if an error occurred.
@@ -171,7 +171,7 @@ public class ChannelLWJGLOpenAL extends Channel
                         "Sound buffers may only be attached to normal " +
                         "sources." ) )
             return false;
-        
+
         // send the sound buffer to the channel:
         AL10.alSourcei( ALSource.get( 0 ), AL10.AL_BUFFER,
                         buf.get(0) );
@@ -190,7 +190,7 @@ public class ChannelLWJGLOpenAL extends Channel
  * @param audioFormat Format to use when playing the stream data.
  */
     @Override
-    public void setAudioFormat( AudioFormat audioFormat )
+    public void setAudioFormat( PAudioFormat audioFormat )
     {
         int soundFormat = 0;
         if( audioFormat.getChannels() == 1 )
@@ -247,7 +247,7 @@ public class ChannelLWJGLOpenAL extends Channel
         ALformat = format;
         sampleRate = rate;
     }
-    
+
 /**
  * Queues up the initial byte[] buffers of data to be streamed.
  * @param bufferList List of the first buffers to be played for a streaming source.
@@ -260,13 +260,13 @@ public class ChannelLWJGLOpenAL extends Channel
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers may only be queued for streaming sources." ) )
             return false;
-        
+
         if( errorCheck( bufferList == null,
                         "Buffer List null in method 'preLoadBuffers'" ) )
             return false;
-        
+
         IntBuffer streamBuffers;
-        
+
         // Remember if the channel was playing:
         boolean playing = playing();
         // stop the channel if it is playing:
@@ -297,13 +297,13 @@ public class ChannelLWJGLOpenAL extends Channel
             AL10.alSourcePlay( ALSource.get( 0 ) );
             checkALError();
         }
-        
+
         streamBuffers = BufferUtils.createIntBuffer( bufferList.size() );
         AL10.alGenBuffers( streamBuffers );
         if( errorCheck( checkALError(),
              "Error generating stream buffers in method 'preLoadBuffers'" ) )
             return false;
-        
+
         ByteBuffer byteBuffer = null;
         for( int i = 0; i < bufferList.size(); i++ )
         {
@@ -329,7 +329,7 @@ public class ChannelLWJGLOpenAL extends Channel
                 return false;
 
         }
-        
+
         try
         {
             AL10.alSourceQueueBuffers( ALSource.get( 0 ), streamBuffers );
@@ -348,11 +348,11 @@ public class ChannelLWJGLOpenAL extends Channel
         if( errorCheck( checkALError(),
                         "Error playing source in method 'preLoadBuffers'" ) )
             return false;
-        
+
         // Success:
         return true;
     }
-    
+
 /**
  * Queues up a byte[] buffer of data to be streamed.
  * @param buffer The next buffer to be played for a streaming source.
@@ -365,7 +365,7 @@ public class ChannelLWJGLOpenAL extends Channel
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers may only be queued for streaming sources." ) )
             return false;
-        
+
         //ByteBuffer byteBuffer = ByteBuffer.wrap( buffer, 0, buffer.length );
         ByteBuffer byteBuffer = (ByteBuffer) BufferUtils.createByteBuffer(
                                            buffer.length ).put( buffer ).flip();
@@ -451,7 +451,7 @@ public class ChannelLWJGLOpenAL extends Channel
         AL10.alSourceQueueBuffers( ALSource.get( 0 ), intBuffer );
         if( checkALError() )
             return -1;
-        
+
         if( attachedSource != null && attachedSource.channel == this &&
             attachedSource.active() )
         {
@@ -465,7 +465,7 @@ public class ChannelLWJGLOpenAL extends Channel
 
         return processed;
     }
-    
+
 /**
  * Returns the number of milliseconds of audio contained in specified buffer.
  * @return milliseconds, or 0 if unable to calculate.
@@ -474,8 +474,8 @@ public class ChannelLWJGLOpenAL extends Channel
     {
         return( ( (float) AL10.alGetBufferi( alBufferi, AL10.AL_SIZE ) /
                 (float) AL10.alGetBufferi( alBufferi, AL10.AL_CHANNELS ) /
-                ( (float) AL10.alGetBufferi( alBufferi, AL10.AL_BITS ) / 8.0f ) /
-                (float) sampleRate ) * 1000 );
+                ( AL10.alGetBufferi( alBufferi, AL10.AL_BITS ) / 8.0f ) /
+                sampleRate ) * 1000 );
     }
 
 /**
@@ -486,7 +486,7 @@ public class ChannelLWJGLOpenAL extends Channel
     public float millisecondsPlayed()
     {
         // get number of samples played in current buffer
-        float offset = (float)AL10.alGetSourcei( ALSource.get( 0 ),
+        float offset = AL10.alGetSourcei( ALSource.get( 0 ),
                                                AL11.AL_BYTE_OFFSET );
 
         float bytesPerFrame = 1f;
@@ -508,7 +508,7 @@ public class ChannelLWJGLOpenAL extends Channel
                 break;
         }
 
-        offset = ( ( (float) offset / bytesPerFrame ) / (float) sampleRate )
+        offset = ( ( offset / bytesPerFrame ) / sampleRate )
                                                                          * 1000;
 
         // add the milliseconds from stream-buffers that played previously
@@ -529,19 +529,19 @@ public class ChannelLWJGLOpenAL extends Channel
         // Only streaming sources process buffers:
         if( channelType != SoundSystemConfig.TYPE_STREAMING )
             return 0;
-        
+
         // determine how many have been processed:
         int processed = AL10.alGetSourcei( ALSource.get( 0 ),
                                            AL10.AL_BUFFERS_PROCESSED );
-        
+
         // Check for errors:
         if( checkALError() )
             return 0;
-        
+
         // Return how many were processed:
         return processed;
     }
-    
+
 /**
  * Dequeues all previously queued data.
  */
@@ -552,14 +552,14 @@ public class ChannelLWJGLOpenAL extends Channel
         // sources have queued buffers:
         if( channelType != SoundSystemConfig.TYPE_STREAMING )
             return;
-        
+
         // determine how many buffers have been queued:
         int queued = AL10.alGetSourcei( ALSource.get( 0 ),
                                         AL10.AL_BUFFERS_QUEUED );
         // Check for errors:
         if( checkALError() )
             return;
-        
+
         IntBuffer intBuffer = BufferUtils.createIntBuffer( 1 );
         while( queued > 0 )
         {
@@ -577,7 +577,7 @@ public class ChannelLWJGLOpenAL extends Channel
         }
        	millisPreviouslyPlayed = 0;
     }
-    
+
 /**
  * Stops the channel, dequeues any queued data, and closes the channel.
  */
@@ -591,13 +591,13 @@ public class ChannelLWJGLOpenAL extends Channel
         }
         catch( Exception e )
         {}
-        
+
         if( channelType == SoundSystemConfig.TYPE_STREAMING )
             flush();
     }
-    
+
 /**
- * Plays the currently attached normal source, opens this channel up for 
+ * Plays the currently attached normal source, opens this channel up for
  * streaming, or resumes playback if this channel was paused.
  */
     @Override
@@ -606,7 +606,7 @@ public class ChannelLWJGLOpenAL extends Channel
         AL10.alSourcePlay( ALSource.get( 0 ) );
         checkALError();
     }
-    
+
 /**
  * Temporarily stops playback for this channel.
  */
@@ -616,9 +616,9 @@ public class ChannelLWJGLOpenAL extends Channel
         AL10.alSourcePause( ALSource.get( 0 ) );
         checkALError();
     }
-    
+
 /**
- * Stops playback for this channel and rewinds the attached source to the 
+ * Stops playback for this channel and rewinds the attached source to the
  * beginning.
  */
     @Override
@@ -628,9 +628,9 @@ public class ChannelLWJGLOpenAL extends Channel
         if( !checkALError() )
             millisPreviouslyPlayed = 0;
     }
-    
+
 /**
- * Rewinds the attached source to the beginning.  Stops the source if it was 
+ * Rewinds the attached source to the beginning.  Stops the source if it was
  * paused.
  */
     @Override
@@ -639,16 +639,16 @@ public class ChannelLWJGLOpenAL extends Channel
         // rewinding for streaming sources is handled elsewhere
         if( channelType == SoundSystemConfig.TYPE_STREAMING )
             return;
-        
+
         AL10.alSourceRewind( ALSource.get( 0 ) );
         if( !checkALError() )
             millisPreviouslyPlayed = 0;
     }
-    
-    
+
+
 /**
- * Used to determine if a channel is actively playing a source.  This method 
- * will return false if the channel is paused or stopped and when no data is 
+ * Used to determine if a channel is actively playing a source.  This method
+ * will return false if the channel is paused or stopped and when no data is
  * queued to be streamed.
  * @return True if this channel is playing a source.
  */
@@ -659,10 +659,10 @@ public class ChannelLWJGLOpenAL extends Channel
                                        AL10.AL_SOURCE_STATE );
         if( checkALError() )
             return false;
-        
+
         return( state == AL10.AL_PLAYING );
     }
-    
+
 /**
  * Checks for OpenAL errors, and prints a message if there is an error.
  * @return True if there was an error, False if not.

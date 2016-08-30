@@ -7,7 +7,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.sound.sampled.AudioFormat;
+
+
 
 // From the lwjgl library, http://www.lwjgl.org
 import org.lwjgl.BufferUtils;
@@ -20,6 +23,8 @@ import paulscode.sound.FilenameURL;
 import paulscode.sound.ICodec;
 import paulscode.sound.Library;
 import paulscode.sound.ListenerData;
+import paulscode.sound.PAudioFormat;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
@@ -137,10 +142,10 @@ public class LibraryLWJGLOpenAL extends Library
  * Whether or not the AL_PITCH control is supported.
  */
     private static boolean alPitchSupported = true;
-    
+
 /**
- * Constructor: Instantiates the source map, buffer map and listener 
- * information.  Also sets the library type to 
+ * Constructor: Instantiates the source map, buffer map and listener
+ * information.  Also sets the library type to
  * SoundSystemConfig.LIBRARY_OPENAL
  */
     public LibraryLWJGLOpenAL() throws SoundSystemException
@@ -149,15 +154,15 @@ public class LibraryLWJGLOpenAL extends Library
         ALBufferMap = new HashMap<String, IntBuffer>();
         reverseByteOrder = true;
     }
-    
+
 /**
- * Initializes OpenAL, creates the listener, and grabs up audio channels. 
+ * Initializes OpenAL, creates the listener, and grabs up audio channels.
  */
     @Override
     public void init() throws SoundSystemException
     {
         boolean errors = false; // set to 'true' if error(s) occur:
-        
+
         try
         {
             // Try and create the sound system:
@@ -173,36 +178,36 @@ public class LibraryLWJGLOpenAL extends Library
             throw new LibraryLWJGLOpenAL.Exception( e.getMessage(),
                                            LibraryLWJGLOpenAL.Exception.CREATE );
         }
-        
+
         // Let user know if the library loaded properly
         if( errors )
             importantMessage( "OpenAL did not initialize properly!" );
         else
             message( "OpenAL initialized." );
-        
+
         // Listener is at the origin, facing along the z axis, no velocity:
-        listenerPositionAL = BufferUtils.createFloatBuffer( 3 ).put( 
+        listenerPositionAL = BufferUtils.createFloatBuffer( 3 ).put(
             new float[] { listener.position.x,
                           listener.position.y,
                           listener.position.z } );
         listenerOrientation = BufferUtils.createFloatBuffer( 6 ).put (
             new float[] { listener.lookAt.x, listener.lookAt.y,
-                          listener.lookAt.z, listener.up.x, listener.up.y, 
+                          listener.lookAt.z, listener.up.x, listener.up.y,
                           listener.up.z } );
         listenerVelocity = BufferUtils.createFloatBuffer( 3 ).put (
             new float[] { 0.0f, 0.0f, 0.0f } );
-        
+
         // Flip the buffers, so they can be used:
         listenerPositionAL.flip();
         listenerOrientation.flip();
         listenerVelocity.flip();
-        
+
         // Pass the buffers to the sound system, and check for potential errors:
         AL10.alListener( AL10.AL_POSITION, listenerPositionAL );
         errors = checkALError() || errors;
         AL10.alListener( AL10.AL_ORIENTATION, listenerOrientation );
         errors = checkALError() || errors;
-        AL10.alListener( AL10.AL_VELOCITY, listenerVelocity );        
+        AL10.alListener( AL10.AL_VELOCITY, listenerVelocity );
         errors = checkALError() || errors;
 
         AL10.alDopplerFactor( SoundSystemConfig.getDopplerFactor() );
@@ -250,7 +255,7 @@ public class LibraryLWJGLOpenAL extends Library
                         "supported.", LibraryLWJGLOpenAL.Exception.NO_AL_PITCH );
         }
     }
-    
+
 /**
  * Checks if the OpenAL library type is compatible.
  * @return True or false.
@@ -259,7 +264,7 @@ public class LibraryLWJGLOpenAL extends Library
     {
         if( AL.isCreated() )
             return true;
-        
+
         try
         {
             AL.create();
@@ -268,20 +273,20 @@ public class LibraryLWJGLOpenAL extends Library
         {
             return false;
         }
-        
+
         try
         {
             AL.destroy();
         }
         catch( java.lang.Exception e )
         {}
-        
+
         return true;
     }
-    
+
 /**
- * Creates a new channel of the specified type (normal or streaming).  Possible 
- * values for channel type can be found in the 
+ * Creates a new channel of the specified type (normal or streaming).  Possible
+ * values for channel type can be found in the
  * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
  * @param type Type of channel.
  */
@@ -290,7 +295,7 @@ public class LibraryLWJGLOpenAL extends Library
     {
         ChannelLWJGLOpenAL channel;
         IntBuffer ALSource;
-        
+
         ALSource = BufferUtils.createIntBuffer( 1 );
         try
         {
@@ -308,21 +313,21 @@ public class LibraryLWJGLOpenAL extends Library
         channel = new ChannelLWJGLOpenAL( type, ALSource );
         return channel;
     }
-    
+
  /**
- * Stops all sources, shuts down OpenAL, and removes references to all 
+ * Stops all sources, shuts down OpenAL, and removes references to all
  * instantiated objects.
  */
     @Override
     public void cleanup()
     {
         super.cleanup();
-        
+
         Set<String> keys = bufferMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String filename;
         IntBuffer buffer;
-        
+
         // loop through and clear all sound buffers:
         while( iter.hasNext() )
         {
@@ -335,10 +340,10 @@ public class LibraryLWJGLOpenAL extends Library
                 buffer.clear();
             }
         }
-        
+
         bufferMap.clear();
         AL.destroy();
-        
+
         bufferMap = null;
         listenerPositionAL = null;
         listenerOrientation = null;
@@ -366,16 +371,16 @@ public class LibraryLWJGLOpenAL extends Library
             importantMessage( "Open AL Buffer Map was null in method" +
                               "'loadSound'" );
         }
-        
+
         // make sure they gave us a filename:
         if( errorCheck( filenameURL == null,
                           "Filename/URL not specified in method 'loadSound'" ) )
             return false;
-        
-        // check if it is already loaded:        
+
+        // check if it is already loaded:
         if( bufferMap.get( filenameURL.getFilename() ) != null )
             return true;
-        
+
         ICodec codec = SoundSystemConfig.getCodec( filenameURL.getFilename() );
         if( errorCheck( codec == null, "No codec found for file '" +
                                        filenameURL.getFilename() +
@@ -399,7 +404,7 @@ public class LibraryLWJGLOpenAL extends Library
 
         bufferMap.put( filenameURL.getFilename(), buffer );
 
-        AudioFormat audioFormat = buffer.audioFormat;
+        AudioFormat audioFormat = AudioFormatConverter.convertAudioFormat(buffer.audioFormat);
         int soundFormat = 0;
         if( audioFormat.getChannels() == 1 )
         {
@@ -442,7 +447,7 @@ public class LibraryLWJGLOpenAL extends Library
 
         IntBuffer intBuffer = BufferUtils.createIntBuffer( 1 );
         AL10.alGenBuffers( intBuffer );
-        if( errorCheck( AL10.alGetError() != AL10.AL_NO_ERROR, 
+        if( errorCheck( AL10.alGetError() != AL10.AL_NO_ERROR,
                         "alGenBuffers error when loading " +
                         filenameURL.getFilename() ) )
             return false;
@@ -456,18 +461,18 @@ public class LibraryLWJGLOpenAL extends Library
                                     buffer.audioData ).flip(),
                            (int) audioFormat.getSampleRate() );
 
-        if( errorCheck( AL10.alGetError() != AL10.AL_NO_ERROR, 
+        if( errorCheck( AL10.alGetError() != AL10.AL_NO_ERROR,
                         "alBufferData error when loading " +
                         filenameURL.getFilename() ) )
-        
-                
+
+
         if( errorCheck( intBuffer == null,
                         "Sound buffer was not created for " +
                         filenameURL.getFilename() ) )
             return false;
-        
+
         ALBufferMap.put( filenameURL.getFilename(), intBuffer );
-        
+
         return true;
     }
 
@@ -511,7 +516,7 @@ public class LibraryLWJGLOpenAL extends Library
 
         bufferMap.put( identifier, buffer );
 
-        AudioFormat audioFormat = buffer.audioFormat;
+        AudioFormat audioFormat = AudioFormatConverter.convertAudioFormat(buffer.audioFormat);
         int soundFormat = 0;
         if( audioFormat.getChannels() == 1 )
         {
@@ -582,11 +587,11 @@ public class LibraryLWJGLOpenAL extends Library
 
         return true;
     }
-    
+
 /**
- * Removes a pre-loaded sound from memory.  This is a good method to use for 
- * freeing up memory after a large sound file is no longer needed.  NOTE: the 
- * source will remain in memory after this method has been called, for as long 
+ * Removes a pre-loaded sound from memory.  This is a good method to use for
+ * freeing up memory after a large sound file is no longer needed.  NOTE: the
+ * source will remain in memory after this method has been called, for as long
  * as the sound is attached to an existing source.
  * @param filename Filename/identifier of the sound file to unload.
  */
@@ -596,20 +601,20 @@ public class LibraryLWJGLOpenAL extends Library
         ALBufferMap.remove( filename );
         super.unloadSound( filename );
     }
-    
+
  /**
  * Sets the overall volume to the specified value, affecting all sources.
  * @param value New volume, float value ( 0.0f - 1.0f ).
- */ 
+ */
     @Override
     public void setMasterVolume( float value )
     {
         super.setMasterVolume( value );
-        
+
         AL10.alListenerf( AL10.AL_GAIN, value );
         checkALError();
     }
-    
+
 /**
  * Creates a new source and places it into the source map.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -633,7 +638,7 @@ public class LibraryLWJGLOpenAL extends Library
         {
             // Grab the sound buffer for this file:
             myBuffer = ALBufferMap.get( filenameURL.getFilename() );
-            
+
             // if not found, try loading it:
             if( myBuffer == null )
             {
@@ -658,7 +663,7 @@ public class LibraryLWJGLOpenAL extends Library
             }
         }
         SoundBuffer buffer = null;
-        
+
         if( !toStream )
         {
             // Grab the audio data for this file:
@@ -685,7 +690,7 @@ public class LibraryLWJGLOpenAL extends Library
                 return;
             }
         }
-        
+
         sourceMap.put( sourcename,
                        new SourceLWJGLOpenAL( listenerPositionAL, myBuffer,
                                          priority, toStream, toLoop,
@@ -706,12 +711,12 @@ public class LibraryLWJGLOpenAL extends Library
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  */
     @Override
-    public void rawDataStream( AudioFormat audioFormat, boolean priority,
+    public void rawDataStream( PAudioFormat audioFormat, boolean priority,
                                String sourcename, float x, float y,
                                float z, int attModel, float distOrRoll )
     {
         sourceMap.put( sourcename,
-                       new SourceLWJGLOpenAL( listenerPositionAL, audioFormat,
+                       new SourceLWJGLOpenAL( listenerPositionAL, AudioFormatConverter.convertAudioFormat(audioFormat),
                                               priority, sourcename, x, y, z,
                                               attModel, distOrRoll ) );
     }
@@ -754,9 +759,9 @@ public class LibraryLWJGLOpenAL extends Library
                 return;
             }
         }
-        
+
         SoundBuffer buffer = null;
-        
+
         if( !toStream )
         {
             // Grab the sound buffer for this file:
@@ -796,7 +801,7 @@ public class LibraryLWJGLOpenAL extends Library
         if( temporary )
             s.setTemporary( true );
 }
-    
+
 /**
  * Creates sources based on the source map provided.
  * @param srcMap Sources to copy.
@@ -807,10 +812,10 @@ public class LibraryLWJGLOpenAL extends Library
         if( srcMap == null )
             return;
         Set<String> keys = srcMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // Make sure the buffer map exists:
         if( bufferMap == null )
         {
@@ -824,10 +829,10 @@ public class LibraryLWJGLOpenAL extends Library
             importantMessage( "Open AL Buffer Map was null in method" +
                               "'copySources'" );
         }
-        
+
         // remove any existing sources before starting:
         sourceMap.clear();
-        
+
         SoundBuffer buffer;
         // loop through and copy all the sources:
         while( iter.hasNext() )
@@ -851,9 +856,9 @@ public class LibraryLWJGLOpenAL extends Library
             }
         }
     }
-    
+
 /**
- * Changes the listener's position. 
+ * Changes the listener's position.
  * @param x Destination X coordinate.
  * @param y Destination Y coordinate.
  * @param z Destination Z coordinate.
@@ -862,19 +867,19 @@ public class LibraryLWJGLOpenAL extends Library
     public void setListenerPosition( float x, float y, float z )
     {
         super.setListenerPosition( x, y, z );
-        
+
         listenerPositionAL.put( 0, x );
         listenerPositionAL.put( 1, y );
         listenerPositionAL.put( 2, z );
-        
+
         // Update OpenAL listener position:
         AL10.alListener( AL10.AL_POSITION, listenerPositionAL );
         // Check for errors:
         checkALError();
     }
-    
+
 /**
- * Changes the listeners orientation to the specified 'angle' radians 
+ * Changes the listeners orientation to the specified 'angle' radians
  * counterclockwise around the y-Axis.
  * @param angle Radians.
  */
@@ -882,16 +887,16 @@ public class LibraryLWJGLOpenAL extends Library
     public void setListenerAngle( float angle )
     {
         super.setListenerAngle( angle );
-        
+
         listenerOrientation.put( 0, listener.lookAt.x );
         listenerOrientation.put( 2, listener.lookAt.z );
-        
+
         // Update OpenAL listener orientation:
         AL10.alListener( AL10.AL_ORIENTATION, listenerOrientation );
         // Check for errors:
         checkALError();
     }
-    
+
 /**
  * Changes the listeners orientation using the specified coordinates.
  * @param lookX X element of the look-at direction.
@@ -915,9 +920,9 @@ public class LibraryLWJGLOpenAL extends Library
         AL10.alListener( AL10.AL_ORIENTATION, listenerOrientation );
         checkALError();
     }
-    
+
 /**
- * Changes the listeners position and orientation using the specified listener 
+ * Changes the listeners position and orientation using the specified listener
  * data.
  * @param l Listener data to use.
  */
@@ -925,7 +930,7 @@ public class LibraryLWJGLOpenAL extends Library
     public void setListenerData( ListenerData l )
     {
         super.setListenerData( l );
-        
+
         listenerPositionAL.put( 0, l.position.x );
         listenerPositionAL.put( 1, l.position.y );
         listenerPositionAL.put( 2, l.position.z );
@@ -947,7 +952,7 @@ public class LibraryLWJGLOpenAL extends Library
         AL10.alListener( AL10.AL_VELOCITY, listenerVelocity );
         checkALError();
     }
-    
+
 /**
  * Sets the listener's velocity, for use in Doppler effect.
  * @param x Velocity along world x-axis.

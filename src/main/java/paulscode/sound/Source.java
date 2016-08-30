@@ -3,15 +3,15 @@ package paulscode.sound;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 /**
- * The Source class is used to store information about a source.  
- * Source objects are stored in a map in the Library class.  The 
+ * The Source class is used to store information about a source.
+ * Source objects are stored in a map in the Library class.  The
  * information they contain is used to create library-specific sources.
- * This is the template class which is extended for each specific library.  
- * This class is also used by the "No Sound" library to represent a mute 
- * source.  
+ * This is the template class which is extended for each specific library.
+ * This class is also used by the "No Sound" library to represent a mute
+ * source.
  *<br><br>
  *<b><i>    SoundSystem License:</b></i><br><b><br>
  *    You are free to use this library for any purpose, commercial or otherwise.
@@ -53,27 +53,27 @@ public class Source
     protected Class libraryType = Library.class;
 
 /**
- * Used to return a current value from one of the synchronized 
+ * Used to return a current value from one of the synchronized
  * boolean-interface methods.
  */
     private static final boolean GET = false;
-    
+
 /**
  * Used to set the value in one of the synchronized boolean-interface methods.
  */
     private static final boolean SET = true;
-    
+
 /**
- * Used when a parameter for one of the synchronized boolean-interface methods 
+ * Used when a parameter for one of the synchronized boolean-interface methods
  * is not aplicable.
  */
     private static final boolean XXX = false;
-    
+
 /**
  * Processes status messages, warnings, and error messages.
  */
     private SoundSystemLogger logger;
-    
+
 /**
  * True if this source is being directly fed with raw audio data.
  */
@@ -82,56 +82,56 @@ public class Source
 /**
  * Format the raw data will be in if this is a Raw Data Stream source.
  */
-    public AudioFormat rawDataFormat = null;
+    public PAudioFormat rawDataFormat = null;
 
 /**
  * Determines whether a source should be removed after it finishes playing.
  */
     public boolean temporary = false;
-    
+
 /**
- * Determines whether or not this is a priority source.  Priority sources will 
+ * Determines whether or not this is a priority source.  Priority sources will
  * not be overwritten by other sources when there are no available channels.
  */
     public boolean priority = false;
-    
+
 /**
  * Whether or not this source should be streamed.
  */
     public boolean toStream = false;
-    
+
 /**
  * Whether this source should loop or only play once.
  */
     public boolean toLoop = false;
-    
+
 /**
- * Whether this source needs to be played (for example if it was playing and 
+ * Whether this source needs to be played (for example if it was playing and
  * looping when it got culled).
  */
     public boolean toPlay = false;
-    
+
 /**
- * Unique name for this source.  More than one source can not have the same 
+ * Unique name for this source.  More than one source can not have the same
  * sourcename.
  */
     public String sourcename = "";
-    
+
 /**
  * The audio file which this source should play.
  */
     public FilenameURL filenameURL = null;
-    
+
 /**
  * This source's position in 3D space.
  */
     public Vector3D position;
-    
+
 /**
  * Attenuation model to use for this source.
  */
     public int attModel = 0;
-    
+
 /**
  * Either fade distance or rolloff factor, depending on the value of attModel.
  */
@@ -141,14 +141,14 @@ public class Source
  * Source's velocity in world-space, for use in Doppler effect.
  */
     public Vector3D velocity;
-    
+
 /**
- * This source's volume (a float between 0.0 - 1.0).  This value is used 
- * internally for attenuation, and should not be used to manually change a 
+ * This source's volume (a float between 0.0 - 1.0).  This value is used
+ * internally for attenuation, and should not be used to manually change a
  * source's volume.
  */
     public float gain = 1.0f;
-    
+
 /**
  * This value should be used to manually increase or decrease source volume.
  */
@@ -158,17 +158,17 @@ public class Source
  * This value represents the source's pitch (float value between 0.5f - 2.0f).
  */
     protected float pitch = 1.0f;
-    
+
 /**
  * This source's distance from the listener.
  */
     public float distanceFromListener = 0.0f;
-    
+
 /**
  * Channel to play this source on.
  */
     public Channel channel = null;
-    
+
 /**
  * Holds the data used by normal sources.
  */
@@ -178,17 +178,17 @@ public class Source
  * False when this source gets culled.
  */
     private boolean active = true;
-    
+
 /**
  * Whether or not this source has been stopped.
  */
     private boolean stopped = true;
-    
+
 /**
  * Whether or not this source has been paused.
  */
     private boolean paused = false;
-    
+
 /**
  * Codec used to read data for streaming sources.
  */
@@ -214,9 +214,9 @@ public class Source
  * Ensures that only one thread accesses the soundSequenceQueue at a time.
  */
     protected final Object soundSequenceLock = new Object();
-    
+
 /**
- * Used by streaming sources to indicate whether or not the initial 
+ * Used by streaming sources to indicate whether or not the initial
  * stream-buffers still need to be queued.
  */
     public boolean preLoad = false;
@@ -247,7 +247,7 @@ public class Source
  * System time in miliseconds when the last fade in/out volume check occurred.
  */
     protected long lastFadeCheck = 0;
-    
+
 /**
  * Constructor:  Creates a new source using the specified parameters.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -270,7 +270,7 @@ public class Source
     {
         // grab a handle to the message logger:
         logger = SoundSystemConfig.getLogger();
-        
+
         this.priority = priority;
         this.toStream = toStream;
         this.toLoop = toLoop;
@@ -286,7 +286,7 @@ public class Source
         if( toStream && filenameURL != null )
             codec = SoundSystemConfig.getCodec( filenameURL.getFilename() );
     }
-    
+
 /**
  * Constructor:  Creates a new source matching the specified one.
  * @param old Source to copy information from.
@@ -296,7 +296,7 @@ public class Source
     {
         // grab a handle to the message logger:
         logger = SoundSystemConfig.getLogger();
-        
+
         priority = old.priority;
         toStream = old.toStream;
         toLoop = old.toLoop;
@@ -307,18 +307,18 @@ public class Source
         distOrRoll = old.distOrRoll;
         velocity = old.velocity.clone();
         temporary = old.temporary;
-        
+
         sourceVolume = old.sourceVolume;
 
         rawDataStream = old.rawDataStream;
         rawDataFormat = old.rawDataFormat;
-        
+
         this.soundBuffer = soundBuffer;
 
         if( toStream && filenameURL != null )
             codec = SoundSystemConfig.getCodec( filenameURL.getFilename() );
     }
-    
+
 /**
  * Constructor:  Creates a new streaming source that will be directly fed with
  * raw audio data.
@@ -331,7 +331,7 @@ public class Source
  * @param attModel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of 'att'.
  */
-    public Source( AudioFormat audioFormat, boolean priority, String sourcename,
+    public Source( PAudioFormat audioFormat, boolean priority, String sourcename,
                    float x, float y, float z, int attModel, float distOrRoll )
     {
         // grab a handle to the message logger:
@@ -353,7 +353,7 @@ public class Source
         rawDataFormat = audioFormat;
     }
 /*  Override methods  */
-    
+
 /**
  * Shuts the source down and removes references to all instantiated objects.
  */
@@ -368,7 +368,7 @@ public class Source
                 soundSequenceQueue.clear();
             soundSequenceQueue = null;
         }
-        
+
         sourcename = null;
         filenameURL = null;
         position = null;
@@ -485,7 +485,7 @@ public class Source
             }
         }
     }
-    
+
 /**
  * Fades out the volume of whatever this source is currently playing, then
  * fades the volume back in playing the specified file.  Final volume after
@@ -518,7 +518,7 @@ public class Source
                           "'fadeOutIn'." );
             return;
         }
-        
+
         fadeOutMilis = milisOut;
         fadeInMilis = milisIn;
 
@@ -545,7 +545,7 @@ public class Source
     {
         if( !toStream )
             return false;
-        
+
         if( fadeOutGain == -1.0f && fadeInGain == 1.0f )
             return false;
 
@@ -665,7 +665,7 @@ public class Source
                 nextCodec = SoundSystemConfig.getCodec(
                                     soundSequenceQueue.get( 0 ).getFilename() );
                 nextCodec.initialize( soundSequenceQueue.get( 0 ).getURL() );
-                
+
                 SoundBuffer buffer = null;
                 for( int i = 0;
                      i < SoundSystemConfig.getNumberStreamingBuffers()
@@ -706,13 +706,13 @@ public class Source
     {
         temporary = tmp;
     }
-    
+
 /**
  * Called every time the listener's position or orientation changes.
  */
     public void listenerMoved()
     {}
-    
+
 /**
  * Moves the source to the specified position.
  * @param x X coordinate to move to.
@@ -725,16 +725,16 @@ public class Source
         position.y = y;
         position.z = z;
     }
-    
+
 /**
  * Called every time the source changes position.
  */
     public void positionChanged()
     {}
-    
+
 /**
- * Sets whether or not this source is a priority source.  A priority source 
- * will not be overritten by another source if there are no channels available 
+ * Sets whether or not this source is a priority source.  A priority source
+ * will not be overritten by another source if there are no channels available
  * to play on.
  * @param pri True or false.
  */
@@ -742,7 +742,7 @@ public class Source
     {
         priority = pri;
     }
-    
+
 /**
  * Sets whether this source should loop or only play once.
  * @param lp True or false.
@@ -751,7 +751,7 @@ public class Source
     {
         toLoop = lp;
     }
-    
+
 /**
  * Sets this source's attenuation model.
  * @param model Attenuation model to use.
@@ -762,7 +762,7 @@ public class Source
     }
 
 /**
- * Sets this source's fade distance or rolloff factor, depending on the 
+ * Sets this source's fade distance or rolloff factor, depending on the
  * attenuation model.
  * @param dr New value for fade distance or rolloff factor.
  */
@@ -792,7 +792,7 @@ public class Source
     {
         return distanceFromListener;
     }
-    
+
 /**
  * Manually sets the specified source's pitch.
  * @param value A float value ( 0.5f - 2.0f ).
@@ -827,7 +827,7 @@ public class Source
     }
 
 /**
- * Changes the sources peripheral information to match the supplied parameters. 
+ * Changes the sources peripheral information to match the supplied parameters.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
  * @param toStream Setting this to true will create a streaming source.
  * @param toLoop Should this source loop, or play only once.
@@ -908,9 +908,9 @@ public class Source
         // change the state of this source to not stopped and not paused:
         stopped( SET, false );
         paused( SET, false );
-    }    
+    }
 /*  END Override methods  */
-    
+
 /**
  * Streams the source on its current channel
  * @return False when stream has finished playing.
@@ -1039,7 +1039,7 @@ public class Source
         }
         return false;
     }
-    
+
 /**
  * Queues up the initial stream-buffers for the stream.
  * @return False if the end of the stream was reached.
@@ -1102,7 +1102,7 @@ public class Source
 
         return true;
     }
-    
+
 /**
  * Pauses the source.
  */
@@ -1115,7 +1115,7 @@ public class Source
         else
             errorMessage( "Channel null in method 'pause'" );
     }
-    
+
 /**
  * Stops the source.
  */
@@ -1129,7 +1129,7 @@ public class Source
         else
             errorMessage( "Channel null in method 'stop'" );
     }
-    
+
 /**
  * Rewinds the source.  If the source was paused, then it is stopped.
  */
@@ -1151,8 +1151,8 @@ public class Source
         }
         else
             errorMessage( "Channel null in method 'rewind'" );
-    }    
-    
+    }
+
 /**
  * Dequeues any previously queued data.
  */
@@ -1163,10 +1163,10 @@ public class Source
         else
             errorMessage( "Channel null in method 'flush'" );
     }
-    
+
 /**
- * Stops and flushes the source, and prevents it from being played again until 
- * the activate() is called.  
+ * Stops and flushes the source, and prevents it from being played again until
+ * the activate() is called.
  */
     public void cull()
     {
@@ -1181,7 +1181,7 @@ public class Source
             channel.close();
         channel = null;
     }
-    
+
 /**
  * Allows a previously culled source to be played again.
  */
@@ -1189,18 +1189,18 @@ public class Source
     {
         active( SET, true );
     }
-    
+
 /**
- * Returns false if the source has been culled.  
+ * Returns false if the source has been culled.
  * @return True or False
  */
     public boolean active()
     {
         return active( GET, XXX );
     }
-    
+
 /**
- * Returns true if the source is playing.  
+ * Returns true if the source is playing.
  * @return True or False
  */
     public boolean playing()
@@ -1212,25 +1212,25 @@ public class Source
         else
             return channel.playing();
     }
-    
+
 /**
- * Returns true if the source has been stopped.  
+ * Returns true if the source has been stopped.
  * @return True or False
  */
     public boolean stopped()
     {
         return stopped( GET, XXX );
     }
-    
+
 /**
- * Returns true if the source has been paused.  
+ * Returns true if the source has been paused.
  * @return True or False
  */
     public boolean paused()
     {
         return paused( GET, XXX );
     }
-    
+
 /**
  * Returns the number of miliseconds since the source began playing.
  * @return miliseconds, or -1 if not playing or unable to calculate
@@ -1244,7 +1244,7 @@ public class Source
     }
 
 /**
- * Sets or returns whether or not the source has been culled.  
+ * Sets or returns whether or not the source has been culled.
  * @return True or False
  */
     private synchronized boolean active( boolean action, boolean value )
@@ -1253,9 +1253,9 @@ public class Source
             active = value;
         return active;
     }
-    
+
 /**
- * Sets or returns whether or not the source has been stopped.  
+ * Sets or returns whether or not the source has been stopped.
  * @return True or False
  */
     private synchronized boolean stopped( boolean action, boolean value )
@@ -1264,9 +1264,9 @@ public class Source
             stopped = value;
         return stopped;
     }
-    
+
 /**
- * Sets or returns whether or not the source has been paused.  
+ * Sets or returns whether or not the source has been paused.
  * @return True or False
  */
     private synchronized boolean paused( boolean action, boolean value )
@@ -1275,7 +1275,7 @@ public class Source
             paused = value;
         return paused;
     }
-    
+
 /**
  * Returns the name of the class.
  * @return SoundLibraryXXXX.
@@ -1297,7 +1297,7 @@ public class Source
     {
         logger.message( message, 0 );
     }
-    
+
 /**
  * Prints an important message.
  * @param message Message to print.
@@ -1306,7 +1306,7 @@ public class Source
     {
         logger.importantMessage( message, 0 );
     }
-    
+
 /**
  * Prints the specified message if error is true.
  * @param error True or False.
@@ -1317,7 +1317,7 @@ public class Source
     {
         return logger.errorCheck( error, getClassName(), message, 0 );
     }
-    
+
 /**
  * Prints an error message.
  * @param message Message to print.

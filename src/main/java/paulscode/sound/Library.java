@@ -5,15 +5,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 /**
- * The Library class is the class from which all library types are extended.  
- * It provides generic methods for interfacing with the audio libraries 
- * supported by the SoundSystem.  Specific libraries should extend this class 
- * and override the necessary methods.  For consistant naming conventions, each 
- * sub-class should have the name prefix "Library".  
- * 
+ * The Library class is the class from which all library types are extended.
+ * It provides generic methods for interfacing with the audio libraries
+ * supported by the SoundSystem.  Specific libraries should extend this class
+ * and override the necessary methods.  For consistant naming conventions, each
+ * sub-class should have the name prefix "Library".
+ *
  * This class may also be used as the "No Sound Library" (i.e. silent mode) if
  * no other audio libraries are supported by the host machine, or to mute all
  * sound.
@@ -56,7 +56,7 @@ public class Library
  * Processes status messages, warnings, and error messages.
  */
     private SoundSystemLogger logger;
-    
+
 /**
  * Position and orientation of the listener.
  */
@@ -76,32 +76,32 @@ public class Library
  * Interface through which MIDI files can be played.
  */
     private MidiChannel midiChannel;
-    
+
 /**
  * Array containing maximum number of non-streaming audio channels.
  */
     protected List<Channel> streamingChannels;
-    
+
 /**
  * Array containing maximum number of non-streaming audio channels.
  */
     protected List<Channel> normalChannels;
-    
+
 /**
  * Source name last played on each streaming channel.
  */
     private String[] streamingChannelSourceNames;
-    
+
 /**
  * Source name last played on each non-streaming channel.
  */
     private String[] normalChannelSourceNames;
-    
+
 /**
  * Increments through the steaming channel list as new sources are played.
  */
     private int nextStreamingChannel = 0;
-    
+
 /**
  * Increments through the non-steaming channel list as new sources are played.
  */
@@ -111,41 +111,41 @@ public class Library
  * Handles processing for all streaming sources.
  */
     protected StreamThread streamThread;
-    
+
 /**
  * Whether or not the library requires reversal of audio data byte order.
  */
     protected boolean reverseByteOrder = false;
-    
+
 /**
- * Constructor: Instantiates the source map and listener information.  NOTES: 
- * The 'super()' method should be at the top of constructors for all extended 
- * classes.  The varriable 'libraryType' should be given a new value in the 
+ * Constructor: Instantiates the source map and listener information.  NOTES:
+ * The 'super()' method should be at the top of constructors for all extended
+ * classes.  The varriable 'libraryType' should be given a new value in the
  * constructors for all extended classes.
  */
     public Library() throws SoundSystemException
     {
         // grab a handle to the message logger:
         logger = SoundSystemConfig.getLogger();
-        
+
         // instantiate the buffer map:
         bufferMap = new HashMap<String, SoundBuffer>();
 
         // instantiate the source map:
         sourceMap = new HashMap<String, Source>();
-        
+
         listener = new ListenerData( 0.0f, 0.0f, 0.0f,  // position
                                      0.0f, 0.0f, -1.0f, // look-at direction
                                      0.0f, 1.0f, 0.0f,  // up direction
                                      0.0f );            // angle
-        
+
         streamingChannels = new LinkedList<Channel>();
         normalChannels = new LinkedList<Channel>();
         streamingChannelSourceNames = new String[
                                SoundSystemConfig.getNumberStreamingChannels() ];
         normalChannelSourceNames = new String[
                                   SoundSystemConfig.getNumberNormalChannels() ];
-        
+
         streamThread = new StreamThread();
         streamThread.start();
     }
@@ -156,16 +156,16 @@ public class Library
 /*                                                                            */
 /*         The following methods should be overrided as required              */
 /* ########################################################################## */
-    
+
 /**
- * Stops all sources, shuts down sound library, and removes references to all 
+ * Stops all sources, shuts down sound library, and removes references to all
  * instantiated objects.
  */
     public void cleanup()
     {
         streamThread.kill();
         streamThread.interrupt();
-        
+
         // wait up to 5 seconds for stream thread to end:
         for( int i = 0; i < 50; i++ )
         {
@@ -178,13 +178,13 @@ public class Library
             catch(Exception e)
             {}
         }
-        
+
         if( streamThread.alive() )
         {
             errorMessage( "Stream thread did not die!" );
             message( "Ignoring errors... continuing clean-up." );
         }
-        
+
         if( midiChannel != null )
         {
             midiChannel.cleanup();
@@ -216,12 +216,12 @@ public class Library
             normalChannels.clear();
             normalChannels = null;
         }
-        
+
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // loop through and cleanup all the sources:
         while( iter.hasNext() )
         {
@@ -232,18 +232,18 @@ public class Library
         }
         sourceMap.clear();
         sourceMap = null;
-        
+
         listener = null;
         streamThread = null;
     }
-    
+
 /**
  * Initializes the sound library.
  */
     public void init() throws SoundSystemException
     {
         Channel channel = null;
-        
+
         // create the streaming channels:
         for( int x = 0; x < SoundSystemConfig.getNumberStreamingChannels(); x++ )
         {
@@ -261,7 +261,7 @@ public class Library
             normalChannels.add( channel );
         }
     }
-    
+
 /**
  * Checks if the no-sound library type is compatible.
  * @return True or false.
@@ -270,10 +270,10 @@ public class Library
     {
         return true;  // the no-sound library is always compatible.
     }
-    
+
 /**
- * Creates a new channel of the specified type (normal or streaming).  Possible 
- * values for channel type can be found in the 
+ * Creates a new channel of the specified type (normal or streaming).  Possible
+ * values for channel type can be found in the
  * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
  * @param type Type of channel.
  * @return The new channel.
@@ -282,9 +282,9 @@ public class Library
     {
         return new Channel( type );
     }
-    
+
 /**
- * Pre-loads a sound into memory.  
+ * Pre-loads a sound into memory.
  * @param filenameURL Filename/URL of the sound file to load.
  * @return True if the sound loaded properly.
  */
@@ -369,7 +369,7 @@ public class Library
  * @param attModel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  */
-    public void rawDataStream( AudioFormat audioFormat, boolean priority,
+    public void rawDataStream( PAudioFormat audioFormat, boolean priority,
                                String sourcename, float posX, float posY,
                                float posZ, int attModel, float distOrRoll )
     {
@@ -377,7 +377,7 @@ public class Library
                        new Source( audioFormat, priority, sourcename, posX,
                                    posY, posZ, attModel, distOrRoll ) );
     }
-    
+
 /**
  * Creates a new source using the specified information.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -401,9 +401,9 @@ public class Library
                                    filenameURL, null, posX, posY, posZ,
                                    attModel, distOrRoll, false ) );
     }
-    
+
 /**
- * Creates and immediately plays a new source that will be removed when it 
+ * Creates and immediately plays a new source that will be removed when it
  * finishes playing.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
  * @param toStream Setting this to true will load the sound in pieces rather than all at once.
@@ -426,11 +426,11 @@ public class Library
                                    filenameURL, null, posX, posY, posZ,
                                    attModel, distOrRoll, tmp ) );
     }
-    
+
 /**
- * 
- * Defines whether or not the source should be removed after it finishes 
- * playing.  
+ *
+ * Defines whether or not the source should be removed after it finishes
+ * playing.
  * @param sourcename The source's name.
  * @param temporary True or False.
  */
@@ -440,7 +440,7 @@ public class Library
         if( mySource != null )
             mySource.setTemporary( temporary );
     }
-    
+
 /**
  * Changes the specified source's position.
  * @param sourcename The source's name.
@@ -454,9 +454,9 @@ public class Library
         if( mySource != null )
             mySource.setPosition( x, y, z );
     }
-    
+
 /**
- * Sets the specified source's priority factor.  A priority source will not be 
+ * Sets the specified source's priority factor.  A priority source will not be
  * overriden if there are too many sources playing at once.
  * @param sourcename The source's name.
  * @param pri True or False.
@@ -467,9 +467,9 @@ public class Library
         if( mySource != null )
             mySource.setPriority( pri );
     }
-    
+
 /**
- * Sets the specified source's looping parameter.  If parameter lp is false, 
+ * Sets the specified source's looping parameter.  If parameter lp is false,
  * the source will play once and stop.
  * @param sourcename The source's name.
  * @param lp True or False.
@@ -480,9 +480,9 @@ public class Library
         if( mySource != null )
             mySource.setLooping( lp );
     }
-    
+
 /**
- * Sets the specified source's attenuation model. 
+ * Sets the specified source's attenuation model.
  * @param sourcename The source's name.
  * @param model Attenuation model to use.
  */
@@ -492,9 +492,9 @@ public class Library
         if( mySource != null )
             mySource.setAttenuation( model );
     }
-    
+
 /**
- * Sets the specified source's fade distance or rolloff factor. 
+ * Sets the specified source's fade distance or rolloff factor.
  * @param sourcename The source's name.
  * @param dr Fade distance or rolloff factor.
  */
@@ -535,7 +535,7 @@ public class Library
  */
     public void dopplerChanged()
     {}
-    
+
 /**
  * Returns the number of miliseconds since the specified source began playing.
  * @return miliseconds, or -1 if not playing or unable to calculate
@@ -649,7 +649,7 @@ public class Library
     }
 
 /**
- * Looks up the specified source and plays it.  
+ * Looks up the specified source and plays it.
  * @param sourcename Name of the source to play.
  */
     public void play( String sourcename )
@@ -659,7 +659,7 @@ public class Library
             errorMessage( "Sourcename not specified in method 'play'" );
             return;
         }
-        
+
         if( midiSourcename( sourcename ) )
         {
             midiChannel.play();
@@ -675,9 +675,9 @@ public class Library
             play( source );
         }
     }
-    
+
 /**
- * Plays the specified source. 
+ * Plays the specified source.
  * @param source The source to play.
  */
     public void play( Source source )
@@ -692,7 +692,7 @@ public class Library
 
         if( !source.active() )
             return;
-        
+
         if( !source.playing() )
         {
             Channel channel = getNextChannel( source );
@@ -712,9 +712,9 @@ public class Library
             }
         }
     }
-    
+
 /**
- * Stops the specified source. 
+ * Stops the specified source.
  * @param sourcename The source's name.
  */
     public void stop( String sourcename )
@@ -735,9 +735,9 @@ public class Library
                 mySource.stop();
         }
     }
-    
+
 /**
- * Pauses the specified source. 
+ * Pauses the specified source.
  * @param sourcename The source's name.
  */
     public void pause( String sourcename )
@@ -758,9 +758,9 @@ public class Library
                 mySource.pause();
         }
     }
-    
+
 /**
- * Rewinds the specified source. 
+ * Rewinds the specified source.
  * @param sourcename The source's name.
  */
     public void rewind( String sourcename )
@@ -792,9 +792,9 @@ public class Library
                 mySource.flush();
         }
     }
-    
+
 /**
- * Culls the specified source.  A culled source will not play until it has been 
+ * Culls the specified source.  A culled source will not play until it has been
  * activated again.
  * @param sourcename The source's name.
  */
@@ -804,9 +804,9 @@ public class Library
         if( mySource != null )
             mySource.cull();
     }
-    
+
 /**
- * Activates a previously culled source, so it can be played again.  
+ * Activates a previously culled source, so it can be played again.
  * @param sourcename The source's name.
  */
     public void activate( String sourcename )
@@ -832,7 +832,7 @@ public class Library
     }
 
 /**
- * Manually sets the specified source's volume.  
+ * Manually sets the specified source's volume.
  * @param sourcename The source's name.
  * @param value A float value ( 0.0f - 1.0f ).
  */
@@ -858,9 +858,9 @@ public class Library
             }
         }
     }
-    
+
 /**
- * Returns the current volume of the specified source, or zero if the specified 
+ * Returns the current volume of the specified source, or zero if the specified
  * source was not found.
  * @param sourcename Source to read volume from.
  * @return Float value representing the source volume (0.0f - 1.0f).
@@ -880,7 +880,7 @@ public class Library
                 return 0.0f;
         }
     }
-    
+
 /**
  * Manually sets the specified source's pitch.
  * @param sourcename The source's name.
@@ -922,7 +922,7 @@ public class Library
     }
 
 /**
- * Moves the listener relative to the current position. 
+ * Moves the listener relative to the current position.
  * @param x X offset.
  * @param y Y offset.
  * @param z Z offset.
@@ -932,9 +932,9 @@ public class Library
         setListenerPosition( listener.position.x + x, listener.position.y + y,
                              listener.position.z + z );
     }
-    
+
 /**
- * Changes the listener's position. 
+ * Changes the listener's position.
  * @param x Destination X coordinate.
  * @param y Destination Y coordinate.
  * @param z Destination Z coordinate.
@@ -943,12 +943,12 @@ public class Library
     {
         // update listener's position
         listener.setPosition( x, y, z );
-        
+
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // loop through and update the volume of all sources:
         while( iter.hasNext() )
         {
@@ -958,9 +958,9 @@ public class Library
                 source.positionChanged();
         }
     }
-    
+
 /**
- * Turn the listener 'angle' radians counterclockwise around the y-Axis, 
+ * Turn the listener 'angle' radians counterclockwise around the y-Axis,
  * relative to the current angle.
  * @param angle Angle in radians.
  */
@@ -982,21 +982,21 @@ public class Library
                 source.positionChanged();
         }
     }
-    
+
 /**
- * Changes the listeners orientation to the specified 'angle' radians 
+ * Changes the listeners orientation to the specified 'angle' radians
  * counterclockwise around the y-Axis.
  * @param angle Angle in radians.
  */
     public void setListenerAngle( float angle )
     {
         listener.setAngle( angle );
-        
+
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // loop through and update the volume of all sources:
         while( iter.hasNext() )
         {
@@ -1006,7 +1006,7 @@ public class Library
                 source.positionChanged();
         }
     }
-    
+
 /**
  * Changes the listeners orientation using the specified coordinates.
  * @param lookX X element of the look-at direction.
@@ -1020,12 +1020,12 @@ public class Library
                                         float upX, float upY, float upZ )
     {
         listener.setOrientation( lookX, lookY, lookZ, upX, upY, upZ );
-        
+
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // loop through and update the volume of all sources:
         while( iter.hasNext() )
         {
@@ -1037,7 +1037,7 @@ public class Library
     }
 
 /**
- * Changes the listeners position and orientation using the specified listener 
+ * Changes the listeners position and orientation using the specified listener
  * data.
  * @param l Listener data to use.
  */
@@ -1045,7 +1045,7 @@ public class Library
     {
         listener.setData( l );
     }
-    
+
 /**
  * Creates sources based on the source map provided.
  * @param srcMap Sources to copy.
@@ -1055,13 +1055,13 @@ public class Library
         if( srcMap == null )
             return;
         Set<String> keys = srcMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source srcData;
-        
+
         // remove any existing sources before starting:
         sourceMap.clear();
-        
+
         // loop through and copy all the sources:
         while( iter.hasNext() )
         {
@@ -1491,10 +1491,10 @@ public class Library
     public void listenerMoved()
     {
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source srcData;
-        
+
         // loop through and copy all the sources:
         while( iter.hasNext() )
         {
@@ -1506,7 +1506,7 @@ public class Library
             }
         }
     }
-    
+
 /**
  * Returns the sources map.
  * @return Map of all sources.
@@ -1515,7 +1515,7 @@ public class Library
     {
         return sourceMap;
     }
-    
+
 /**
  * Returns information about the listener.
  * @return A ListenerData object.
@@ -1524,7 +1524,7 @@ public class Library
     {
         return listener;
     }
-    
+
 /**
  * Indicates whether or not this library requires some codecs to reverse-order
  * the audio data they generate.
@@ -1542,7 +1542,7 @@ public class Library
     {
         return "No Sound";
     }
-    
+
 /**
  * Returns a longer description of this library type.
  * @return A longer description.
@@ -1551,7 +1551,7 @@ public class Library
     {
         return "Silent Mode";
     }
-    
+
 /**
  * Returns the name of the class.
  * @return "Library" + library title.
@@ -1560,7 +1560,7 @@ public class Library
     {
         return "Library";
     }
-    
+
 /**
  * Prints a message.
  * @param message Message to print.
@@ -1569,7 +1569,7 @@ public class Library
     {
         logger.message( message, 0 );
     }
-    
+
 /**
  * Prints an important message.
  * @param message Message to print.
@@ -1578,7 +1578,7 @@ public class Library
     {
         logger.importantMessage( message, 0 );
     }
-    
+
 /**
  * Prints the specified message if error is true.
  * @param error True or False.
@@ -1589,7 +1589,7 @@ public class Library
     {
         return logger.errorCheck( error, getClassName(), message, 0 );
     }
-    
+
 /**
  * Prints an error message.
  * @param message Message to print.
@@ -1598,7 +1598,7 @@ public class Library
     {
         logger.errorMessage( getClassName(), message, 0 );
     }
-    
+
 /**
  * Prints an exception's error message followed by the stack trace.
  * @param e Exception containing the information to print.

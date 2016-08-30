@@ -6,8 +6,11 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+
+
 
 // From the j-ogg library, http://www.j-ogg.de
 import de.jarnbjo.ogg.CachedUrlStream;
@@ -15,8 +18,9 @@ import de.jarnbjo.ogg.EndOfOggStreamException;
 import de.jarnbjo.ogg.LogicalOggStream;
 import de.jarnbjo.vorbis.IdentificationHeader;
 import de.jarnbjo.vorbis.VorbisStream;
-
 import paulscode.sound.ICodec;
+import paulscode.sound.PAudioFormat;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemLogger;
@@ -204,11 +208,11 @@ public class CodecJOgg implements ICodec
             // Set up the audio format to use during playback:
             myAudioFormat = new AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED,
-                    (float) myIdentificationHeader.getSampleRate(),
+                    myIdentificationHeader.getSampleRate(),
                     16,
                     myIdentificationHeader.getChannels(),
                     myIdentificationHeader.getChannels() * 2,
-                    (float) myIdentificationHeader.getSampleRate(),
+                    myIdentificationHeader.getSampleRate(),
                     true );
 
             // Create the actual audio input stream:
@@ -327,7 +331,7 @@ public class CodecJOgg implements ICodec
                                       audioFormat.getSampleSizeInBits() == 16 );
 
         // Wrap the data into a SoundBuffer:
-        SoundBuffer buffer = new SoundBuffer( data, audioFormat );
+        SoundBuffer buffer = new SoundBuffer( data, AudioFormatConverter.convertAudioFormat(audioFormat) );
 
         // Return the result:
         return buffer;
@@ -442,7 +446,7 @@ public class CodecJOgg implements ICodec
                                     myAudioFormat.getSampleSizeInBits() == 16 );
 
         // Wrap the data into an SoundBuffer:
-        SoundBuffer soundBuffer = new SoundBuffer( data, myAudioFormat );
+        SoundBuffer soundBuffer = new SoundBuffer( data, AudioFormatConverter.convertAudioFormat(myAudioFormat) );
 
         // Close the audio input stream
         try
@@ -509,9 +513,9 @@ public class CodecJOgg implements ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat()
+    public PAudioFormat getAudioFormat()
     {
-        return myAudioFormat;
+        return AudioFormatConverter.convertAudioFormat(myAudioFormat);
     }
 
 /**
@@ -702,7 +706,8 @@ public class CodecJOgg implements ICodec
     * the input stream.
     * @return The next byte of data, or -1 if EOS.
     */
-        public int read() throws IOException
+        @Override
+		public int read() throws IOException
         {
             return 0;
         }

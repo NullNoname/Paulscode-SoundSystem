@@ -6,12 +6,15 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import paulscode.sound.ICodec;
+import paulscode.sound.PAudioFormat;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemLogger;
@@ -115,7 +118,7 @@ public class CodecWav implements ICodec
     {
         initialized( SET, false );
         cleanup();
-        
+
         if( url == null )
         {
             errorMessage( "url null in method 'initialize'" );
@@ -222,7 +225,7 @@ public class CodecWav implements ICodec
                                       audioFormat.getSampleSizeInBits() == 16 );
 
         // Wrap the data into a SoundBuffer:
-        SoundBuffer buffer = new SoundBuffer( data, audioFormat );
+        SoundBuffer buffer = new SoundBuffer( data, AudioFormatConverter.convertAudioFormat(audioFormat) );
 
         // Return the result:
         return buffer;
@@ -341,7 +344,7 @@ public class CodecWav implements ICodec
                                     myAudioFormat.getSampleSizeInBits() == 16 );
 
         // Wrap the data into an SoundBuffer:
-        SoundBuffer soundBuffer = new SoundBuffer( data, myAudioFormat );
+        SoundBuffer soundBuffer = new SoundBuffer( data, AudioFormatConverter.convertAudioFormat(myAudioFormat) );
 
         // Close the audio input stream
         try
@@ -384,11 +387,11 @@ public class CodecWav implements ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat()
+    public PAudioFormat getAudioFormat()
     {
         if( myAudioInputStream == null )
             return null;
-        return myAudioInputStream.getFormat();
+        return AudioFormatConverter.convertAudioFormat(myAudioInputStream.getFormat());
     }
 
 /**

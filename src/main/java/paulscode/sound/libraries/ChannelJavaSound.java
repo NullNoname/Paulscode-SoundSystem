@@ -12,15 +12,17 @@ import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
 import paulscode.sound.Channel;
+import paulscode.sound.PAudioFormat;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
 
 /**
- * The ChannelJavaSound class is used to reserve a sound-card voice using 
+ * The ChannelJavaSound class is used to reserve a sound-card voice using
  * JavaSound.  Channels can be either normal or streaming channels.
- * 
- * For more information about the JavaSound API, visit 
- * http://java.sun.com/products/java-media/sound/ 
+ *
+ * For more information about the JavaSound API, visit
+ * http://java.sun.com/products/java-media/sound/
  *<br><br>
  *<b><i>    SoundSystem LibraryJavaSound License:</b></i><br><b><br>
  *    You are free to use this library for any purpose, commercial or otherwise.
@@ -62,27 +64,27 @@ public class ChannelJavaSound extends Channel
  */
     public Clip clip = null;
 /**
- * The paulscode.sound.LibraryJavaSound.SoundBuffer containing the sound data 
+ * The paulscode.sound.LibraryJavaSound.SoundBuffer containing the sound data
  * to play for a normal source.
  */
     SoundBuffer soundBuffer;
     // END NORMAL SOURCE VARRIABLES
-    
+
     // STREAMING SOURCE VARRIABLES:
 /**
  * Used to play back a streaming source.
- */    
+ */
     public SourceDataLine sourceDataLine = null;
 /**
- * List of paulscode.sound.LibraryJavaSound.SoundBuffer, used to queue chunks 
+ * List of paulscode.sound.LibraryJavaSound.SoundBuffer, used to queue chunks
  * of sound data to be streamed.
  */
     private List<SoundBuffer> streamBuffers;
 /**
  * Number of queued stream-buffers that have finished being processed.
- */    
+ */
     private int processed = 0;
-    
+
     // END STREAMING SOURCE VARRIABLES:
 
 /**
@@ -93,7 +95,7 @@ public class ChannelJavaSound extends Channel
  * Format to use when playing back the assigned source.
  */
     private AudioFormat myFormat = null;
-    
+
 /**
  * Control for changing the gain.
  */
@@ -107,7 +109,7 @@ public class ChannelJavaSound extends Channel
  * Control for changing the sample rate.
  */
     private FloatControl sampleRateControl = null;
-        
+
 /**
  * The initial decible change (start at normal volume).
  */
@@ -117,16 +119,16 @@ public class ChannelJavaSound extends Channel
  * The initial sample rate for this channel.
  */
     private float initialSampleRate = 0.0f;
-    
+
 /**
- * When toLoop is true, the assigned source is immediately replayed when the 
+ * When toLoop is true, the assigned source is immediately replayed when the
  * end is reached.
  */
     private boolean toLoop = false;
-    
+
 /**
- * Constructor:  takes channelType identifier and a handle to the Mixer as 
- * paramaters.  Possible values for channel type can be found in the 
+ * Constructor:  takes channelType identifier and a handle to the Mixer as
+ * paramaters.  Possible values for channel type can be found in the
  * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
  * @param type Type of channel (normal or streaming).
  * @param mixer Handle to the JavaSound Mixer.
@@ -135,15 +137,15 @@ public class ChannelJavaSound extends Channel
     {
         super( type );
         libraryType = LibraryJavaSound.class;
-        
+
         myMixer = mixer;
         clip = null;
         sourceDataLine = null;
         streamBuffers = new LinkedList<SoundBuffer>();
     }
-    
+
 /**
- * Empties the streamBuffers list, shuts the channel down and removes 
+ * Empties the streamBuffers list, shuts the channel down and removes
  * references to all instantiated objects.
  */
     @Override
@@ -160,7 +162,7 @@ public class ChannelJavaSound extends Channel
             }
             streamBuffers.clear();
         }
-        
+
         clip = null;
         soundBuffer = null;
         sourceDataLine = null;
@@ -168,7 +170,7 @@ public class ChannelJavaSound extends Channel
         myMixer = null;
         myFormat = null;
         streamBuffers = null;
-        
+
         super.cleanup();
     }
 
@@ -201,7 +203,7 @@ public class ChannelJavaSound extends Channel
             }
         }
     }
-    
+
 /**
  * Attaches the SoundBuffer to be played back for a normal source.
  * @param buffer SoundBuffer containing the wave data and format to attach
@@ -214,35 +216,35 @@ public class ChannelJavaSound extends Channel
                         "Buffers may only be attached to non-streaming " +
                         "sources" ) )
             return false;
-        
+
         // make sure the Mixer exists:
         if( errorCheck( myMixer == null,
                         "Mixer null in method 'attachBuffer'" ) )
             return false;
-        
+
         // make sure the buffer exists:
         if( errorCheck( buffer == null,
                         "Buffer null in method 'attachBuffer'" ) )
             return false;
-        
+
         // make sure the buffer exists:
         if( errorCheck( buffer.audioData == null,
                         "Buffer missing audio data in method " +
                         "'attachBuffer'" ) )
             return false;
-        
+
         // make sure there is format information about this sound buffer:
         if( errorCheck( buffer.audioFormat == null,
                         "Buffer missing format information in method " +
                         "'attachBuffer'" ) )
             return false;
-            
+
         DataLine.Info lineInfo;
-        lineInfo = new DataLine.Info( Clip.class, buffer.audioFormat );
-        if( errorCheck( !AudioSystem.isLineSupported( lineInfo ), 
+        lineInfo = new DataLine.Info( Clip.class, AudioFormatConverter.convertAudioFormat(buffer.audioFormat) );
+        if( errorCheck( !AudioSystem.isLineSupported( lineInfo ),
                         "Line not supported in method 'attachBuffer'" ) )
                 return false;
-        
+
         Clip newClip = null;
         try
         {
@@ -254,11 +256,11 @@ public class ChannelJavaSound extends Channel
             printStackTrace( e );
             return false;
         }
-        
+
         if( errorCheck( newClip == null,
                         "New clip null in method 'attachBuffer'" ) )
             return false;
-        
+
         // if there was already a clip playing on this channel, remove it now:
         if( clip != null )
         {
@@ -266,13 +268,13 @@ public class ChannelJavaSound extends Channel
             clip.flush();
             clip.close();
         }
-        
+
         // Update the clip and format varriables:
         clip = newClip;
         soundBuffer = buffer;
-        myFormat = buffer.audioFormat;
+        myFormat = AudioFormatConverter.convertAudioFormat(buffer.audioFormat);
         newClip = null;
-        
+
         try
         {
             clip.open( myFormat, buffer.audioData, 0, buffer.audioData.length );
@@ -284,21 +286,21 @@ public class ChannelJavaSound extends Channel
             printStackTrace( e );
             return false;
         }
-        
+
         resetControls();
-        
+
         // Success:
         return true;
     }
-    
+
 /**
  * Sets the channel up to receive the specified audio format.
  * @param audioFormat Format to use when playing the stream data.
  */
     @Override
-    public void setAudioFormat( AudioFormat audioFormat )
+    public void setAudioFormat( PAudioFormat audioFormat )
     {
-        resetStream( audioFormat );
+        resetStream( AudioFormatConverter.convertAudioFormat(audioFormat) );
         if( attachedSource != null && attachedSource.rawDataStream &&
             attachedSource.active() && sourceDataLine != null )
             sourceDataLine.start();
@@ -315,18 +317,18 @@ public class ChannelJavaSound extends Channel
         if( errorCheck( myMixer == null,
                         "Mixer null in method 'resetStream'" ) )
             return false;
-        
+
         // make sure a format was specified:
         if( errorCheck( format == null,
                         "AudioFormat null in method 'resetStream'" ) )
             return false;
-        
+
         DataLine.Info lineInfo;
         lineInfo = new DataLine.Info( SourceDataLine.class, format );
-        if( errorCheck( !AudioSystem.isLineSupported( lineInfo ), 
+        if( errorCheck( !AudioSystem.isLineSupported( lineInfo ),
                         "Line not supported in method 'resetStream'" ) )
             return false;
-        
+
         SourceDataLine newSourceDataLine = null;
         try
         {
@@ -339,14 +341,14 @@ public class ChannelJavaSound extends Channel
             printStackTrace( e );
             return false;
         }
-        
+
         if( errorCheck( newSourceDataLine == null,
                         "New SourceDataLine null in method 'resetStream'" ) )
             return false;
-        
+
         streamBuffers.clear();
         processed = 0;
-        
+
         // if there was already something playing on this channel, remove it:
         if( sourceDataLine != null )
         {
@@ -354,12 +356,12 @@ public class ChannelJavaSound extends Channel
             sourceDataLine.flush();
             sourceDataLine.close();
         }
-        
+
         // Update the clip and format varriables:
-        sourceDataLine = newSourceDataLine;  
+        sourceDataLine = newSourceDataLine;
         myFormat = format;
         newSourceDataLine = null;
-        
+
         try
         {
             sourceDataLine.open( myFormat );
@@ -371,13 +373,13 @@ public class ChannelJavaSound extends Channel
             printStackTrace( e );
             return false;
         }
-        
+
         resetControls();
-        
+
         // Success:
         return true;
     }
-    
+
 /**
  * (Re)Creates the pan and gain controls for this channel.
  */
@@ -518,7 +520,7 @@ public class ChannelJavaSound extends Channel
                 break;
         }
     }
-    
+
 /**
  * Defines whether playback should loop or just play once.
  * @param value Loop or not.
@@ -527,10 +529,10 @@ public class ChannelJavaSound extends Channel
     {
         toLoop = value;
     }
-    
+
 /**
- * Changes the pan between left and right speaker to the specified value. 
- * -1 = left speaker only.  0 = middle, both speakers.  1 = right speaker only. 
+ * Changes the pan between left and right speaker to the specified value.
+ * -1 = left speaker only.  0 = middle, both speakers.  1 = right speaker only.
  * @param p Pan value to use.
  */
     public void setPan( float p )
@@ -548,7 +550,7 @@ public class ChannelJavaSound extends Channel
         panControl.setValue( pan );
     }
 /**
- * Changes the volume. 
+ * Changes the volume.
  * 0 = no volume.  1 = maximum volume (initial gain)
  * @param g Gain value to use.
  */
@@ -557,14 +559,14 @@ public class ChannelJavaSound extends Channel
         // Make sure there is a gain control
         if( gainControl == null )
             return;
-        
+
         // make sure the value is valid (between 0 and 1)
         float gain = g;
         if( gain < 0.0f )
             gain = 0.0f;
         if( gain > 1.0f )
             gain = 1.0f;
-        
+
         double minimumDB = gainControl.getMinimum();
         double maximumDB = initialGain;
 
@@ -605,7 +607,7 @@ public class ChannelJavaSound extends Channel
         // Update the pan:
         sampleRateControl.setValue( sampleRate );
     }
-    
+
 /**
  * Queues up the initial byte[] buffers of data to be streamed.
  * @param bufferList List of the first buffers to be played for a streaming source.
@@ -618,12 +620,12 @@ public class ChannelJavaSound extends Channel
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers may only be queued for streaming sources." ) )
             return false;
-        
+
         // Make sure we have a SourceDataLine:
         if( errorCheck( sourceDataLine == null,
                         "SourceDataLine null in method 'preLoadBuffers'." ) )
             return false;
-        
+
         sourceDataLine.start();
 
         if( bufferList.isEmpty() )
@@ -631,29 +633,29 @@ public class ChannelJavaSound extends Channel
 
         // preload one stream buffer worth of data:
         byte[] preLoad = bufferList.remove( 0 );
-        
+
         // Make sure we have some data:
         if( errorCheck( preLoad == null,
                         "Missing sound-bytes in method 'preLoadBuffers'." ) )
             return false;
-        
-        // If we are using more than one stream buffer, pre-load the 
+
+        // If we are using more than one stream buffer, pre-load the
         // remaining ones now:
         while( !bufferList.isEmpty() )
         {
             streamBuffers.add( new SoundBuffer( bufferList.remove( 0 ),
-                                                myFormat ) );
+            		AudioFormatConverter.convertAudioFormat(myFormat) ) );
         }
-        
+
         // Pre-load the first stream buffer into the dataline:
         sourceDataLine.write( preLoad, 0, preLoad.length );
 
 
         processed = 0;
-        
+
         return true;
     }
-    
+
 /**
  * Queues up a byte[] buffer of data to be streamed.
  * @param buffer The next buffer to be played for a streaming source.
@@ -666,29 +668,29 @@ public class ChannelJavaSound extends Channel
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers may only be queued for streaming sources." ) )
             return false;
-        
+
         // Make sure we have a SourceDataLine:
         if( errorCheck( sourceDataLine == null,
                         "SourceDataLine null in method 'queueBuffer'." ) )
             return false;
-        
+
         // make sure a format was specified:
         if( errorCheck( myFormat == null,
                         "AudioFormat null in method 'queueBuffer'" ) )
             return false;
-        
+
         // Queue a new buffer:
-        streamBuffers.add( new SoundBuffer( buffer, myFormat ) );
-        
+        streamBuffers.add( new SoundBuffer( buffer, AudioFormatConverter.convertAudioFormat(myFormat) ) );
+
         // Dequeue a buffer and process it:
         processBuffer();
-        
+
         processed = 0;
         return true;
     }
- 
+
 /**
- * Plays the next queued byte[] buffer.  This method is run from the seperate 
+ * Plays the next queued byte[] buffer.  This method is run from the seperate
  * {@link paulscode.sound.StreamThread StreamThread}.
  * @return False when no more buffers are left to process.
  */
@@ -699,15 +701,15 @@ public class ChannelJavaSound extends Channel
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers are only processed for streaming sources." ) )
             return false;
-        
+
         // Make sure we have a SourceDataLine:
         if( errorCheck( sourceDataLine == null,
                         "SourceDataLine null in method 'processBuffer'." ) )
             return false;
-        
+
         if( streamBuffers == null || streamBuffers.isEmpty() )
             return false;
-        
+
         // Dequeue a buffer and feed it to the SourceDataLine:
         SoundBuffer nextBuffer = streamBuffers.remove( 0 );
 
@@ -717,7 +719,7 @@ public class ChannelJavaSound extends Channel
             sourceDataLine.start();
         nextBuffer.cleanup();
         nextBuffer = null;
-        
+
         return true;
     }
 
@@ -737,12 +739,12 @@ public class ChannelJavaSound extends Channel
         if( errorCheck( streamBuffers == null,
                     "StreamBuffers queue null in method 'feedRawAudioData'." ) )
             return -1;
-        
-        streamBuffers.add( new SoundBuffer( buffer, myFormat ) );
+
+        streamBuffers.add( new SoundBuffer( buffer, AudioFormatConverter.convertAudioFormat(myFormat) ) );
         return buffersProcessed();
     }
 
-    
+
 /**
  * Returns the number of queued byte[] buffers that have finished playing.
  * @return Number of buffers processed.
@@ -751,7 +753,7 @@ public class ChannelJavaSound extends Channel
     public int buffersProcessed()
     {
         processed = 0;
-        
+
         // Stream buffers can only be queued for streaming sources:
         if( errorCheck( channelType != SoundSystemConfig.TYPE_STREAMING,
                         "Buffers may only be queued for streaming sources." ) )
@@ -760,7 +762,7 @@ public class ChannelJavaSound extends Channel
                 streamBuffers.clear();
             return 0;
         }
-        
+
         // Make sure we have a SourceDataLine:
         if( sourceDataLine == null )
         {
@@ -768,15 +770,15 @@ public class ChannelJavaSound extends Channel
                 streamBuffers.clear();
             return 0;
         }
-        
+
         if( sourceDataLine.available() > 0 )
         {
             processed = 1;
         }
-        
+
         return processed;
     }
-    
+
 /**
  * Dequeues all previously queued data.
  */
@@ -787,20 +789,20 @@ public class ChannelJavaSound extends Channel
         // Only streaming sources process buffers:
         if( channelType != SoundSystemConfig.TYPE_STREAMING )
             return;
-        
+
         // Make sure we have a SourceDataLine:
         if( errorCheck( sourceDataLine == null,
                         "SourceDataLine null in method 'flush'." ) )
             return;
-        
+
         sourceDataLine.stop();
         sourceDataLine.flush();
         sourceDataLine.drain();
-        
+
         streamBuffers.clear();
         processed = 0;
     }
-    
+
 /**
  * Stops the channel, dequeues any queued data, and closes the channel.
  */
@@ -828,9 +830,9 @@ public class ChannelJavaSound extends Channel
                 break;
         }
     }
-    
+
 /**
- * Plays the currently attached normal source, opens this channel up for 
+ * Plays the currently attached normal source, opens this channel up for
  * streaming, or resumes playback if this channel was paused.
  */
     @Override
@@ -864,7 +866,7 @@ public class ChannelJavaSound extends Channel
                 break;
         }
     }
-    
+
 /**
  * Temporarily stops playback for this channel.
  */
@@ -885,9 +887,9 @@ public class ChannelJavaSound extends Channel
                 break;
         }
     }
-    
+
 /**
- * Stops playback for this channel and rewinds the attached source to the 
+ * Stops playback for this channel and rewinds the attached source to the
  * beginning.
  */
     @Override
@@ -910,9 +912,9 @@ public class ChannelJavaSound extends Channel
                 break;
         }
     }
-    
+
 /**
- * Rewinds the attached source to the beginning.  Stops the source if it was 
+ * Rewinds the attached source to the beginning.  Stops the source if it was
  * paused.
  */
     @Override
@@ -965,8 +967,8 @@ public class ChannelJavaSound extends Channel
         }
     }
 /**
- * Used to determine if a channel is actively playing a source.  This method 
- * will return false if the channel is paused or stopped and when no data is 
+ * Used to determine if a channel is actively playing a source.  This method
+ * will return false if the channel is paused or stopped and when no data is
  * queued to be streamed.
  * @return True if this channel is playing a source.
  */

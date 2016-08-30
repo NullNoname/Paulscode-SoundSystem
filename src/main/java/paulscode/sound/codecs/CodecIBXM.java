@@ -7,7 +7,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
@@ -120,7 +120,7 @@ public class CodecIBXM implements ICodec
 /**
  * Format the converted audio will be in.
  */
-    private AudioFormat myAudioFormat = null;
+    private PAudioFormat myAudioFormat = null;
 
 /**
  * True if the using library requires data read by this codec to be
@@ -209,8 +209,8 @@ public class CodecIBXM implements ICodec
         if( ibxm == null )
             ibxm = new IBXM( 48000 );
         if( myAudioFormat == null )
-            myAudioFormat = new AudioFormat( 48000, 16, 2, true, true );
-        
+            myAudioFormat = new PAudioFormat( 48000, 16, 2, true, true );
+
         try
         {
             setModule( loadModule( is ) );
@@ -245,7 +245,7 @@ public class CodecIBXM implements ICodec
             }
             return false;
         }
-        
+
         if( is != null )
         {
             try
@@ -294,7 +294,7 @@ public class CodecIBXM implements ICodec
             return null;
         }
 
-        int bufferFrameSize = (int) SoundSystemConfig.getStreamingBufferSize()
+        int bufferFrameSize = SoundSystemConfig.getStreamingBufferSize()
                                     / 4;
 
         int frames = songDuration - playPosition;
@@ -348,7 +348,7 @@ public class CodecIBXM implements ICodec
             return null;
         }
 
-        int bufferFrameSize = (int) SoundSystemConfig.getFileChunkSize()
+        int bufferFrameSize = SoundSystemConfig.getFileChunkSize()
                                     / 4;
 
 		byte[] outputBuffer = new byte[ bufferFrameSize * 4 ];
@@ -413,7 +413,7 @@ public class CodecIBXM implements ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat()
+    public PAudioFormat getAudioFormat()
     {
         return myAudioFormat;
     }

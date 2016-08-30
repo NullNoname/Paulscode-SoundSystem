@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownServiceException;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 // From the JOrbis library, http://www.jcraft.com/jorbis/
 import com.jcraft.jogg.Packet;
@@ -104,7 +104,7 @@ public class CodecJOrbis implements ICodec
 /**
  * Format in which the converted audio data is stored.
  */
-    private AudioFormat audioFormat;
+    private PAudioFormat audioFormat;
 
 /**
  * True if there is no more data to read in.
@@ -318,7 +318,7 @@ public class CodecJOrbis implements ICodec
         int channels = jorbisInfo.channels;
         int rate = jorbisInfo.rate;
 
-        audioFormat = new AudioFormat( (float) rate, 16, channels, true,
+        audioFormat = new PAudioFormat( rate, 16, channels, true,
                                        false );
         pcmInfo = new float[1][][];
         pcmIndex = new int[ jorbisInfo.channels ];
@@ -346,7 +346,7 @@ public class CodecJOrbis implements ICodec
     public SoundBuffer read()
     {
         byte[] returnBuffer = null;
-        
+
         while( !endOfStream( GET, XXX ) && ( returnBuffer == null ||
             returnBuffer.length < SoundSystemConfig.getStreamingBufferSize() ) )
         {
@@ -430,7 +430,7 @@ public class CodecJOrbis implements ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat()
+    public PAudioFormat getAudioFormat()
     {
         return audioFormat;
     }
@@ -530,7 +530,7 @@ public class CodecJOrbis implements ICodec
 
             joggSyncState.wrote( bytes );
         }
-        
+
         index = joggSyncState.buffer( bufferSize );
         buffer = joggSyncState.data;
 

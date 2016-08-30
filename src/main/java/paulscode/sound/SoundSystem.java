@@ -8,23 +8,23 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.Set;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 /**
  * The SoundSystem class is the core class for the SoundSystem library.  It is
- * capable of interfacing with external sound library and codec library 
- * pluggins.  This core class is stripped down to give it a smaller memory 
- * footprint and to make it more customizable.  This library was created to 
- * provide a simple, common interface to a variety of 3rd-party sound and codec 
- * libraries, and to simplify switching between them on the fly.  If no 
- * external pluggins are loaded, this core class by itself is only capable of 
+ * capable of interfacing with external sound library and codec library
+ * pluggins.  This core class is stripped down to give it a smaller memory
+ * footprint and to make it more customizable.  This library was created to
+ * provide a simple, common interface to a variety of 3rd-party sound and codec
+ * libraries, and to simplify switching between them on the fly.  If no
+ * external pluggins are loaded, this core class by itself is only capable of
  * playing MIDI files.  Specific implementations (such as SoundSystemJPCT) will
  * extend this core class.  They will automatically link with popular
  * external pluggins and provide extra methods for ease of use.
  * There should be only one instance of this class in any program!  The
  * SoundSystem can be constructed by defining which sound library to use, or by
  * allowing SoundSystem to perform its own library compatibility checking.  See
- * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for information 
+ * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for information
  * about changing default settings and linking with external pluggins.
  *<br><br>
  *<b><i>    SoundSystem License:</b></i><br><b><br>
@@ -62,7 +62,7 @@ import javax.sound.sampled.AudioFormat;
 public class SoundSystem
 {
 /**
- * Used to return a current value from one of the synchronized 
+ * Used to return a current value from one of the synchronized
  * boolean-interface methods.
  */
     private static final boolean GET = false;
@@ -71,26 +71,26 @@ public class SoundSystem
  */
     private static final boolean SET = true;
 /**
- * Used when a parameter for one of the synchronized boolean-interface methods 
+ * Used when a parameter for one of the synchronized boolean-interface methods
  * is not aplicable.
  */
     private static final boolean XXX = false;
-    
+
 /**
  * Processes status messages, warnings, and error messages.
  */
     protected SoundSystemLogger logger;
-    
+
 /**
  * Handle to the active sound library.
  */
     protected Library soundLibrary;
-    
+
 /**
  * List of queued commands to perform.
  */
     protected List<CommandObject> commandQueue;
-    
+
 /**
  * Used internally by SoundSystem to keep track of play/pause/stop/rewind
  * commands.  This prevents source management (culling and activating) from
@@ -98,42 +98,42 @@ public class SoundSystem
  * methods.
  */
     private List<CommandObject> sourcePlayList;
-    
+
 /**
  * Processes queued commands in the background.
  */
-    protected CommandThread commandThread;    
-    
+    protected CommandThread commandThread;
+
 /**
  * Generates random numbers.
  */
     public Random randomNumberGenerator;
-    
+
 /**
  * Name of this class.
  */
     protected String className = "SoundSystem";
-    
+
 /**
  * Indicates the currently loaded sound-library, or null if none.
  */
     private static Class currentLibrary = null;
-    
+
 /**
  * Becomes true when the sound library has been initialized.
  */
     private static boolean initialized = false;
-    
+
 /**
  * Indicates the last exception that was thrown.
  */
     private static SoundSystemException lastException = null;
 
 /**
- * Constructor: Create the sound system using the default library.  If the 
- * default library is not compatible, another library type will be loaded 
+ * Constructor: Create the sound system using the default library.  If the
+ * default library is not compatible, another library type will be loaded
  * instead, in the order of library preference.
- * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for 
+ * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for
  * information about sound library types.
  */
     public SoundSystem()
@@ -179,9 +179,9 @@ public class SoundSystem
             logger.printExceptionMessage( sse, 1 );
         }
     }
-    
+
 /**
- * Constructor: Create the sound system using the specified library.  
+ * Constructor: Create the sound system using the specified library.
  * @param libraryClass Library to use.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for
  * information about chosing a sound library.
@@ -211,10 +211,10 @@ public class SoundSystem
     protected void linkDefaultLibrariesAndCodecs()
     {
     }
-    
+
 /**
  * Loads the message logger, initializes the specified sound library, and
- * starts the command thread.  Also instantiates the random number generator 
+ * starts the command thread.  Also instantiates the random number generator
  * and the command queue.
  * @param libraryClass Library to initialize.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for
@@ -224,26 +224,26 @@ public class SoundSystem
     {
         message( "", 0 );
         message( "Starting up " + className + "...", 0 );
-        
+
         // create the random number generator:
         randomNumberGenerator = new Random();
         // create the command queue:
         commandQueue = new LinkedList<CommandObject>();
         // create the working source playlist:
         sourcePlayList = new LinkedList<CommandObject>();
-        
+
         // Instantiate and start the Command Processer thread:
         commandThread = new CommandThread( this ); // Gets a SoundSystem handle
         commandThread.start();
-        
+
         snooze( 200 );
-        
+
         newLibrary( libraryClass );
         message( "", 0 );
     }
-    
+
 /**
- * Ends the command thread, shuts down the sound system, and removes references 
+ * Ends the command thread, shuts down the sound system, and removes references
  * to all instantiated objects.
  */
     public void cleanup()
@@ -251,7 +251,7 @@ public class SoundSystem
         boolean killException = false;
         message( "", 0 );
         message( className + " shutting down...", 0 );
-        
+
         // End the command thread:
         try
         {
@@ -262,7 +262,7 @@ public class SoundSystem
         {
             killException = true;
         }
-        
+
         if( !killException )
         {
             // wait up to 5 seconds for command thread to end:
@@ -273,14 +273,14 @@ public class SoundSystem
                 snooze( 100 );
             }
         }
-        
+
         // Let user know if there was a problem ending the command thread
         if( killException || commandThread.alive() )
         {
             errorMessage( "Command thread did not die!", 0 );
             message( "Ignoring errors... continuing clean-up.", 0 );
         }
-        
+
         initialized( SET, false );
         currentLibrary( SET, null );
         try
@@ -294,7 +294,7 @@ public class SoundSystem
             errorMessage( "Problem during Library.cleanup()!", 0 );
             message( "Ignoring errors... continuing clean-up.", 0 );
         }
-        
+
         try
         {
             // remove any queued commands:
@@ -306,7 +306,7 @@ public class SoundSystem
             errorMessage( "Unable to clear the command queue!", 0 );
             message( "Ignoring errors... continuing clean-up.", 0 );
         }
-        
+
         try
         {
             // empty the source management list:
@@ -318,14 +318,14 @@ public class SoundSystem
             errorMessage( "Unable to clear the source management list!", 0 );
             message( "Ignoring errors... continuing clean-up.", 0 );
         }
-        
+
         // Remove references to all instantiated objects:
         randomNumberGenerator = null;
         soundLibrary = null;
         commandQueue = null;
         sourcePlayList = null;
         commandThread = null;
-        
+
         importantMessage( "Author: Paul Lamb, www.paulscode.com", 1 );
         message( "", 0 );
     }
@@ -348,12 +348,12 @@ public class SoundSystem
         // Wake the command thread to process commands:
         commandThread.interrupt();
     }
-    
+
 /**
- * Pre-loads a sound into memory.  The file may either be located within the 
- * JAR or at an online location.  If the file is online, filename must begin 
- * with "http://", since that is how SoundSystem recognizes URL's.  If the file 
- * is located within the compiled JAR, the package in which sound files are 
+ * Pre-loads a sound into memory.  The file may either be located within the
+ * JAR or at an online location.  If the file is online, filename must begin
+ * with "http://", since that is how SoundSystem recognizes URL's.  If the file
+ * is located within the compiled JAR, the package in which sound files are
  * located may be set by calling SoundSystemConfig.setSoundFilesPackage().
  * @param filename Filename of the sound file to load.
  */
@@ -365,7 +365,7 @@ public class SoundSystem
         // Wake the command thread to process commands:
         commandThread.interrupt();
     }
-    
+
 /**
  * Pre-loads a sound specified by the given URL into memory.  The second
  * parameter 'identifier' should look like a filename, and it must have the
@@ -391,7 +391,7 @@ public class SoundSystem
  * @param format Format the sample data is stored in
  * @param identifier What to call the sample.
  */
-    public void loadSound( byte[] data, AudioFormat format, String identifier )
+    public void loadSound( byte[] data, PAudioFormat format, String identifier )
     {
         // Queue a command to load the sound file from a URL:
         CommandQueue( new CommandObject( CommandObject.LOAD_DATA,
@@ -403,11 +403,11 @@ public class SoundSystem
 
 
 /**
- * Removes a pre-loaded sound from memory.  This is a good method to use for 
- * freeing up memory after a large sound file is no longer needed.  NOTE: the 
- * source will remain in memory after calling this method as long as the 
+ * Removes a pre-loaded sound from memory.  This is a good method to use for
+ * freeing up memory after a large sound file is no longer needed.  NOTE: the
+ * source will remain in memory after calling this method as long as the
  * sound is attached to an existing source.  When calling this method, calls
- * should also be made to method removeSource( String ) for all sources which 
+ * should also be made to method removeSource( String ) for all sources which
  * this sound is bound to.
  * @param filename Filename/identifier of the sound file to unload.
  */
@@ -418,14 +418,14 @@ public class SoundSystem
         // Wake the command thread to process commands:
         commandThread.interrupt();
     }
-    
+
 /**
  * If the specified source is a streaming source or MIDI source, this method
  * queues up the next sound to play when the previous playback ends. The file
- * may either be located within the JAR or at an online location.  If the file 
- * is online, filename must begin with "http://", since that is how SoundSystem 
- * recognizes URL paths.  If the file is located within the compiled JAR, the 
- * package in which sound files are located may be set by calling 
+ * may either be located within the JAR or at an online location.  If the file
+ * is online, filename must begin with "http://", since that is how SoundSystem
+ * recognizes URL paths.  If the file is located within the compiled JAR, the
+ * package in which sound files are located may be set by calling
  * SoundSystemConfig.setSoundFilesPackage().  This method has no effect on
  * non-streaming sources.
  * @param sourcename Source identifier.
@@ -540,11 +540,11 @@ public class SoundSystem
  * Fades out the volume of whatever the specified source is currently playing,
  * then fades the volume back in playing the specified filename.  Final volume
  * after fade-in completes will be equal to the source's previously assigned
- * volume level.  The filename parameter may not be null or empty.  The file 
- * may either be located within the JAR or at an online location.  If the file 
- * is online, filename must begin with "http://", since that is how 
- * SoundSystem recognizes URL paths.  If the file is located within the 
- * compiled JAR, the package in which sound files are located may be set by 
+ * volume level.  The filename parameter may not be null or empty.  The file
+ * may either be located within the JAR or at an online location.  If the file
+ * is online, filename must begin with "http://", since that is how
+ * SoundSystem recognizes URL paths.  If the file is located within the
+ * compiled JAR, the package in which sound files are located may be set by
  * calling SoundSystemConfig.setSoundFilesPackage().  The miliseconds
  * parameters must be non-negative or zero.  This method will remove anything
  * that is currently in the specified source's list of queued sounds that would
@@ -626,7 +626,7 @@ public class SoundSystem
  * @param sourcename A unique identifier for this source.  Two sources may not use the same sourcename.
  * @param filename Filename of the sound file to stream at this source.
  * @param toLoop Should this source loop, or play only once.
- */    
+ */
     public void backgroundMusic( String sourcename, String filename,
                                  boolean toLoop )
     {
@@ -636,7 +636,7 @@ public class SoundSystem
                            new FilenameURL( filename ), 0, 0, 0,
                            SoundSystemConfig.ATTENUATION_NONE, 0, false ) );
         CommandQueue( new CommandObject( CommandObject.PLAY, sourcename) );
-        
+
         commandThread.interrupt();
     }
 
@@ -664,11 +664,11 @@ public class SoundSystem
 
         commandThread.interrupt();
     }
-    
+
 /**
- * Creates a new non-streaming source.  
+ * Creates a new non-streaming source.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
- * information about Attenuation, fade distance, and rolloff factor.  
+ * information about Attenuation, fade distance, and rolloff factor.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
  * @param sourcename A unique identifier for this source.  Two sources may not use the same sourcename.
  * @param filename Filename/identifier of the sound file to play at this source.
@@ -678,7 +678,7 @@ public class SoundSystem
  * @param z Z position for this source.
  * @param attmodel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
- */    
+ */
     public void newSource( boolean priority, String sourcename, String filename,
                            boolean toLoop, float x, float y, float z,
                            int attmodel, float distOrRoll )
@@ -732,7 +732,7 @@ public class SoundSystem
  * @param z Z position for this source.
  * @param attmodel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
- */    
+ */
     public void newStreamingSource( boolean priority, String sourcename,
                                     String filename, boolean toLoop, float x,
                                     float y, float z, int attmodel,
@@ -744,7 +744,7 @@ public class SoundSystem
                                           attmodel, distOrRoll ) );
         commandThread.interrupt();
     }
-    
+
 /**
  * Creates a new streaming source.  The fourth parameter 'identifier' should
  * look like a filename, and it must have the correct extension so SoundSystem
@@ -786,7 +786,7 @@ public class SoundSystem
  * @param attModel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  */
-    public void rawDataStream( AudioFormat audioFormat, boolean priority,
+    public void rawDataStream( PAudioFormat audioFormat, boolean priority,
                                String sourcename, float x, float y, float z,
                                int attModel, float distOrRoll )
     {
@@ -797,9 +797,9 @@ public class SoundSystem
     }
 
 /**
- * Creates a temporary source and plays it.  After the source finishes playing, 
- * it is removed.  Returns a randomly generated name for the new source.  NOTE: 
- * to make a source created by this method permanant, call the setActive() 
+ * Creates a temporary source and plays it.  After the source finishes playing,
+ * it is removed.  Returns a randomly generated name for the new source.  NOTE:
+ * to make a source created by this method permanant, call the setActive()
  * method using the return value for sourcename.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
  * @param filename Filename/identifier of the sound file to play at this source.
@@ -810,7 +810,7 @@ public class SoundSystem
  * @param attmodel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  * @return The new sorce's name.
- */    
+ */
     public String quickPlay( boolean priority, String filename, boolean toLoop,
                              float x, float y, float z, int attmodel,
                              float distOrRoll )
@@ -819,7 +819,7 @@ public class SoundSystem
         String sourcename = "Source_"
                             + randomNumberGenerator.nextInt()
                             + "_" + randomNumberGenerator.nextInt();
-        
+
         // Queue a command to quick play this new source:
         CommandQueue( new CommandObject( CommandObject.QUICK_PLAY, priority,
                                           false, toLoop, sourcename,
@@ -828,7 +828,7 @@ public class SoundSystem
         CommandQueue( new CommandObject( CommandObject.PLAY, sourcename) );
         // Wake the command thread to process commands:
         commandThread.interrupt();
-        
+
         // return the new source name.
         return sourcename;
     }
@@ -873,7 +873,7 @@ public class SoundSystem
     }
 
 /**
- * Creates a temporary source and streams it.  After the source finishes 
+ * Creates a temporary source and streams it.  After the source finishes
  * playing, it is removed.  The file may either be located within the
  * JAR or at an online location.  If the file is online, filename must begin
  * with "http://", since that is how SoundSystem recognizes URL paths.  If the
@@ -891,16 +891,16 @@ public class SoundSystem
  * @param attmodel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  * @return The new sorce's name.
- */    
-    public String quickStream( boolean priority, String filename, 
-                               boolean toLoop, float x, float y, float z, 
+ */
+    public String quickStream( boolean priority, String filename,
+                               boolean toLoop, float x, float y, float z,
                                int attmodel, float distOrRoll )
     {
         //generate a random name for this source:
         String sourcename = "Source_"
                             + randomNumberGenerator.nextInt()
                             + "_" + randomNumberGenerator.nextInt();
-        
+
         // Queue a command to quick stream this new source:
         CommandQueue( new CommandObject( CommandObject.QUICK_PLAY, priority,
                            true, toLoop, sourcename,
@@ -909,7 +909,7 @@ public class SoundSystem
         CommandQueue( new CommandObject( CommandObject.PLAY, sourcename) );
         // Wake the command thread to process commands:
         commandThread.interrupt();
-        
+
         // return the new source name.
         return sourcename;
     }
@@ -954,14 +954,14 @@ public class SoundSystem
         // return the new source name.
         return sourcename;
     }
-    
+
 /**
- * Move a source to the specified location.  
+ * Move a source to the specified location.
  * @param sourcename Identifier for the source.
  * @param x destination X coordinate.
  * @param y destination Y coordinate.
  * @param z destination Z coordinate.
- */    
+ */
     public void setPosition( String sourcename, float x, float y, float z )
     {
         CommandQueue( new CommandObject( CommandObject.SET_POSITION,
@@ -981,7 +981,7 @@ public class SoundSystem
     }
 
 /**
- * Returns the current volume of the specified source, or zero if the specified 
+ * Returns the current volume of the specified source, or zero if the specified
  * source was not found.
  * @param sourcename Source to read volume from.
  * @return Float value representing the source volume (0.0f - 1.0f).
@@ -1027,7 +1027,7 @@ public class SoundSystem
  * too many sources are playing at once.
  * @param sourcename Identifier for the source.
  * @param pri Setting this to true makes this source a priority source.
- */    
+ */
     public void setPriority( String sourcename, boolean pri )
     {
         CommandQueue( new CommandObject( CommandObject.SET_PRIORITY,
@@ -1038,7 +1038,7 @@ public class SoundSystem
  * Changes a source to looping or non-looping.
  * @param sourcename Identifier for the source.
  * @param lp This source should loop.
- */    
+ */
     public void setLooping( String sourcename, boolean lp )
     {
         CommandQueue( new CommandObject( CommandObject.SET_LOOPING,
@@ -1048,10 +1048,10 @@ public class SoundSystem
 /**
  * Changes a source's attenuation model.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
- * information about Attenuation.  
+ * information about Attenuation.
  * @param sourcename Identifier for the source.
  * @param model Attenuation model to use.
- */    
+ */
     public void setAttenuation( String sourcename, int model )
     {
         CommandQueue( new CommandObject( CommandObject.SET_ATTENUATION,
@@ -1061,10 +1061,10 @@ public class SoundSystem
 /**
  * Changes a source's fade distance or rolloff factor.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
- * information about fade distance and rolloff.  
+ * information about fade distance and rolloff.
  * @param sourcename Identifier for the source.
  * @param dr Either the fading distance or rolloff factor, depending on the attenuation model used.
- */    
+ */
     public void setDistOrRoll( String sourcename, float dr)
     {
         CommandQueue( new CommandObject( CommandObject.SET_DIST_OR_ROLL,
@@ -1113,7 +1113,7 @@ public class SoundSystem
                                          sourcename, x, y, z ) );
         commandThread.interrupt();
     }
-    
+
 /**
  * Sets the listener's velocity, for use in Doppler effect.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
@@ -1163,7 +1163,7 @@ public class SoundSystem
 /**
  * Plays the specified source.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void play( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.PLAY, sourcename) );
@@ -1172,7 +1172,7 @@ public class SoundSystem
 /**
  * Pauses the specified source.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void pause( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.PAUSE, sourcename) );
@@ -1181,7 +1181,7 @@ public class SoundSystem
 /**
  * Stops the specified source.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void stop( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.STOP, sourcename) );
@@ -1190,7 +1190,7 @@ public class SoundSystem
 /**
  * Rewinds the specified source.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void rewind( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.REWIND, sourcename) );
@@ -1207,50 +1207,50 @@ public class SoundSystem
     }
 
 /**
- * Culls the specified source.  A culled source can not be played until it has 
+ * Culls the specified source.  A culled source can not be played until it has
  * been activated again.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void cull( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.CULL, sourcename) );
         commandThread.interrupt();
     }
-    
+
 /**
- * Activates the specified source after it was culled, so it can be played 
- * again.  
+ * Activates the specified source after it was culled, so it can be played
+ * again.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void activate( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.ACTIVATE, sourcename) );
         commandThread.interrupt();
     }
-    
+
 /**
- * Sets a flag for a source indicating whether it should be used or if it 
- * should be removed after it finishes playing.  One possible use for this 
- * method is to make temporary sources that were created with quickPlay() 
- * permanant.  Another use could be to have a source automatically removed 
+ * Sets a flag for a source indicating whether it should be used or if it
+ * should be removed after it finishes playing.  One possible use for this
+ * method is to make temporary sources that were created with quickPlay()
+ * permanant.  Another use could be to have a source automatically removed
  * after it finishes playing.  NOTE: Setting a source to temporary does not
- * stop it, and setting a source to permanant does not play it.  It is also 
+ * stop it, and setting a source to permanant does not play it.  It is also
  * important to note that a looping temporary source will not be removed as
  * long as it keeps playing.
  * @param sourcename Identifier for the source.
  * @param temporary True = temporary, False = permanant.
- */    
+ */
     public void setTemporary( String sourcename, boolean temporary )
     {
         CommandQueue( new CommandObject( CommandObject.SET_TEMPORARY,
                                          sourcename, temporary ) );
         commandThread.interrupt();
     }
-    
+
 /**
  * Removes the specified source and clears up any memory it used.
  * @param sourcename Identifier for the source.
- */    
+ */
     public void removeSource( String sourcename )
     {
         CommandQueue( new CommandObject( CommandObject.REMOVE_SOURCE,
@@ -1262,7 +1262,7 @@ public class SoundSystem
  * @param x X offset.
  * @param y Y offset.
  * @param z Z offset.
- */    
+ */
     public void moveListener( float x, float y, float z )
     {
         CommandQueue( new CommandObject( CommandObject.MOVE_LISTENER,
@@ -1274,7 +1274,7 @@ public class SoundSystem
  * @param x Destination X coordinate.
  * @param y Destination Y coordinate.
  * @param z Destination Z coordinate.
- */    
+ */
     public void setListenerPosition( float x, float y, float z )
     {
         CommandQueue( new CommandObject( CommandObject.SET_LISTENER_POSITION,
@@ -1282,10 +1282,10 @@ public class SoundSystem
         commandThread.interrupt();
     }
 /**
- * Turns the listener counterclockwise by "angle" radians around the y-axis, 
+ * Turns the listener counterclockwise by "angle" radians around the y-axis,
  * relative to the current angle.
  * @param angle radian offset.
- */    
+ */
     public void turnListener( float angle )
     {
         CommandQueue( new CommandObject( CommandObject.TURN_LISTENER,
@@ -1295,13 +1295,13 @@ public class SoundSystem
 /**
  * Sets the listener's angle in radians around the y-axis.
  * @param angle radians.
- */    
+ */
     public void setListenerAngle( float angle )
     {
         CommandQueue( new CommandObject( CommandObject.SET_LISTENER_ANGLE,
                                          angle ) );
         commandThread.interrupt();
-    }    
+    }
 /**
  * Sets the listener's orientation.
  * @param lookX X coordinate of the (normalized) look-at vector.
@@ -1310,7 +1310,7 @@ public class SoundSystem
  * @param upX X coordinate of the (normalized) up-direction vector.
  * @param upY Y coordinate of the (normalized) up-direction vector.
  * @param upZ Z coordinate of the (normalized) up-direction vector.
- */    
+ */
     public void setListenerOrientation( float lookX, float lookY, float lookZ,
                                         float upX, float upY, float upZ )
     {
@@ -1318,7 +1318,7 @@ public class SoundSystem
                                          lookX, lookY, lookZ, upX, upY, upZ ) );
         commandThread.interrupt();
     }
-    
+
 /**
  * Sets the overall volume, affecting all sources.
  * @param value New volume, float value ( 0.0f - 1.0f ).
@@ -1329,7 +1329,7 @@ public class SoundSystem
                                          value ) );
         commandThread.interrupt();
     }
-    
+
 /**
  * Returns the overall volume, affecting all sources.
  * @return Float value representing the master volume (0.0f - 1.0f).
@@ -1338,10 +1338,10 @@ public class SoundSystem
     {
         return SoundSystemConfig.getMasterGain();
     }
-    
+
 /**
- * Method for obtaining information about the listener's position and 
- * orientation.  
+ * Method for obtaining information about the listener's position and
+ * orientation.
  * @return a {@link paulscode.sound.ListenerData ListenerData} object.
  */
     public ListenerData getListenerData()
@@ -1352,7 +1352,7 @@ public class SoundSystem
         }
     }
 /**
- * Switches to the specified library, and preserves all sources.  
+ * Switches to the specified library, and preserves all sources.
  * @param libraryClass Library to use.
  * @return True if switch was successful.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for
@@ -1460,9 +1460,9 @@ public class SoundSystem
             return true;
         }
     }
-    
+
 /**
- * Switches to the specified library, loosing all sources.  
+ * Switches to the specified library, loosing all sources.
  * @param libraryClass Library to use.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for
  * information about chosing a sound library.
@@ -1471,20 +1471,20 @@ public class SoundSystem
                                                      throws SoundSystemException
     {
         initialized( SET, false );
-        
+
         CommandQueue( new CommandObject( CommandObject.NEW_LIBRARY,
                                          libraryClass ) );
         commandThread.interrupt();
-        
+
         for( int x = 0; (!initialized( GET, XXX )) && (x < 100); x++ )
         {
             snooze( 400 );
             commandThread.interrupt();
         }
-        
+
         if( !initialized( GET, XXX ) )
         {
-            SoundSystemException sse = new SoundSystemException( 
+            SoundSystemException sse = new SoundSystemException(
                                             className +
                                             " did not load after 30 seconds.",
                                             SoundSystemException.LIBRARY_NULL );
@@ -1499,7 +1499,7 @@ public class SoundSystem
         }
         return true;
     }
-        
+
 /**
  * Switches to the specified library, loosing all sources.  This method is used
  * internally by SoundSystem for thread synchronization, and it can not be
@@ -1511,7 +1511,7 @@ public class SoundSystem
     private void CommandNewLibrary( Class libraryClass )
     {
         initialized( SET, false );
-        
+
         String headerMessage = "Initializing ";
         if( soundLibrary != null )
         {
@@ -1581,10 +1581,10 @@ public class SoundSystem
             initialized( SET, true );
             return;
         }
-        
+
         lastException( SET, null );
         initialized( SET, true );
-        
+
         return;
     }
 /**
@@ -1600,9 +1600,9 @@ public class SoundSystem
                             "initialization in method 'CommandInitialize'",
                             1 ) )
             {
-                SoundSystemException sse = new SoundSystemException( 
+                SoundSystemException sse = new SoundSystemException(
                                        className + " did not load properly.  " +
-                                       "Library was null after initialization.", 
+                                       "Library was null after initialization.",
                                        SoundSystemException.LIBRARY_NULL );
                 lastException( SET, sse );
                 throw sse;
@@ -1767,7 +1767,7 @@ public class SoundSystem
                           "'CommandCheckFadeVolumes'", 0 );
     }
 /**
- * Loads a sound file into memory.  This method is used internally by 
+ * Loads a sound file into memory.  This method is used internally by
  * SoundSystem for thread synchronization, and it can not be called directly -
  * please use the newSource() method instead.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -1819,7 +1819,7 @@ public class SoundSystem
  * @param attModel Attenuation model to use.
  * @param distOrRoll Either the fading distance or rolloff factor, depending on the value of "attmodel".
  */
-    private void CommandRawDataStream( AudioFormat audioFormat,
+    private void CommandRawDataStream( PAudioFormat audioFormat,
                                          boolean priority, String sourcename,
                                          float x, float y, float z,
                                          int attModel, float distOrRoll )
@@ -1832,8 +1832,8 @@ public class SoundSystem
            "Variable 'soundLibrary' null in method 'CommandRawDataStream'", 0 );
     }
 /**
- * Creates a temporary source and either plays or streams it.  After the source 
- * finishes playing, it is removed.  This method is used internally by 
+ * Creates a temporary source and either plays or streams it.  After the source
+ * finishes playing, it is removed.  This method is used internally by
  * SoundSystem for thread synchronization, and it can not be called directly -
  * please use the quickPlay() method instead.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
@@ -1927,7 +1927,7 @@ public class SoundSystem
  * called directly - please use the setPriority() method instead.
  * @param sourcename Identifier for the source.
  * @param pri Setting this to true makes this source a priority source.
- */    
+ */
     private void CommandSetPriority( String sourcename, boolean pri )
     {
         if( soundLibrary != null )
@@ -1942,7 +1942,7 @@ public class SoundSystem
  * called directly - please use the setLooping() method instead.
  * @param sourcename Identifier for the source.
  * @param lp This source should loop.
- */    
+ */
     private void CommandSetLooping( String sourcename, boolean lp )
     {
         if( soundLibrary != null )
@@ -1956,10 +1956,10 @@ public class SoundSystem
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the setAttenuation() method instead.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
- * information about Attenuation.  
+ * information about Attenuation.
  * @param sourcename Identifier for the source.
  * @param model Attenuation model to use.
- */    
+ */
     private void CommandSetAttenuation( String sourcename, int model )
     {
         if( soundLibrary != null )
@@ -1972,10 +1972,10 @@ public class SoundSystem
 /**
  * Changes a source's fade distance or rolloff factor.
  * See {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} for more
- * information about fade distance and rolloff.  
+ * information about fade distance and rolloff.
  * @param sourcename Identifier for the source.
  * @param dr Either the fading distance or rolloff factor, depending on the attenuation model used.
- */    
+ */
     private void CommandSetDistOrRoll( String sourcename, float dr )
     {
         if( soundLibrary != null )
@@ -2069,7 +2069,7 @@ public class SoundSystem
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the play() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandPlay( String sourcename )
     {
         if( soundLibrary != null )
@@ -2100,7 +2100,7 @@ public class SoundSystem
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the pause() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandPause( String sourcename )
     {
         if( soundLibrary != null )
@@ -2114,7 +2114,7 @@ public class SoundSystem
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the stop() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandStop( String sourcename )
     {
         if( soundLibrary != null )
@@ -2128,7 +2128,7 @@ public class SoundSystem
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the rewind() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandRewind( String sourcename )
     {
         if( soundLibrary != null )
@@ -2152,13 +2152,13 @@ public class SoundSystem
             "Variable 'soundLibrary' null in method 'CommandFlush'", 0 );
     }
 /**
- * Sets a flag for a source indicating whether it should be used or if it 
- * should be removed after it finishes playing.  One possible use for this 
- * method is to make temporary sources that were created with quickPlay() 
- * permanant.  Another use could be to have a source automatically removed 
- * after it finishes playing.  NOTE: Setting a source to inactive does not stop 
- * it, and setting a source to active does not play it.  It is also important 
- * to note that a looping inactive source will not be removed as long as 
+ * Sets a flag for a source indicating whether it should be used or if it
+ * should be removed after it finishes playing.  One possible use for this
+ * method is to make temporary sources that were created with quickPlay()
+ * permanant.  Another use could be to have a source automatically removed
+ * after it finishes playing.  NOTE: Setting a source to inactive does not stop
+ * it, and setting a source to active does not play it.  It is also important
+ * to note that a looping inactive source will not be removed as long as
  * it keeps playing.  This method is used
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the setTemporary() method instead.
@@ -2168,24 +2168,24 @@ public class SoundSystem
     private void CommandSetTemporary( String sourcename, boolean temporary )
     {
         if( soundLibrary != null )
-            soundLibrary.setTemporary( sourcename, temporary );        
+            soundLibrary.setTemporary( sourcename, temporary );
         else
             errorMessage(
-               "Variable 'soundLibrary' null in method 'CommandSetActive'", 0 );                    
+               "Variable 'soundLibrary' null in method 'CommandSetActive'", 0 );
     }
 /**
  * Removes the specified source and clears up any memory it used.  This method
  * is used internally by SoundSystem for thread synchronization, and it can not
  * be called directly - please use the removeSource() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandRemoveSource( String sourcename )
     {
         if( soundLibrary != null )
             soundLibrary.removeSource( sourcename );
         else
             errorMessage(
-            "Variable 'soundLibrary' null in method 'CommandRemoveSource'", 0 );                    
+            "Variable 'soundLibrary' null in method 'CommandRemoveSource'", 0 );
     }
 /**
  * Moves the listener relative to the current location.  This method is used
@@ -2194,7 +2194,7 @@ public class SoundSystem
  * @param x X offset.
  * @param y Y offset.
  * @param z Z offset.
- */    
+ */
     private void CommandMoveListener( float x, float y, float z )
     {
         if( soundLibrary != null )
@@ -2210,7 +2210,7 @@ public class SoundSystem
  * @param x Destination X coordinate.
  * @param y Destination Y coordinate.
  * @param z Destination Z coordinate.
- */    
+ */
    private void CommandSetListenerPosition( float x, float y, float z )
     {
         if( soundLibrary != null )
@@ -2221,12 +2221,12 @@ public class SoundSystem
           0 );
     }
 /**
- * Turns the listener counterclockwise by "angle" radians around the y-axis, 
+ * Turns the listener counterclockwise by "angle" radians around the y-axis,
  * relative to the current angle.  This method is used
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the turnListener() method instead.
  * @param angle radian offset.
- */    
+ */
     private void CommandTurnListener( float angle )
     {
         if( soundLibrary != null )
@@ -2234,14 +2234,14 @@ public class SoundSystem
         else
             errorMessage(
                  "Variable 'soundLibrary' null in method 'CommandTurnListener'",
-                 0 );                    
+                 0 );
     }
 /**
  * Sets the listener's angle in radians around the y-axis.  This method is used
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the setListenerAngle() method instead.
  * @param angle radians.
- */    
+ */
     private void CommandSetListenerAngle( float angle )
     {
         if( soundLibrary != null )
@@ -2249,7 +2249,7 @@ public class SoundSystem
         else
             errorMessage(
              "Variable 'soundLibrary' null in method 'CommandSetListenerAngle'",
-             0 );                    
+             0 );
     }
 /**
  * Sets the listener's orientation.  This method is used
@@ -2261,7 +2261,7 @@ public class SoundSystem
  * @param upX X coordinate of the (normalized) look-at vector.
  * @param upY Y coordinate of the (normalized) look-at vector.
  * @param upZ Z coordinate of the (normalized) look-at vector.
- */    
+ */
     private void CommandSetListenerOrientation( float lookX, float lookY,
                                                   float lookZ, float upX,
                                                   float upY, float upZ )
@@ -2272,15 +2272,15 @@ public class SoundSystem
         else
             errorMessage(
        "Variable 'soundLibrary' null in method 'CommandSetListenerOrientation'",
-       0 );                    
+       0 );
     }
 /**
- * Culls the specified source.  A culled source can not be played until it has 
+ * Culls the specified source.  A culled source can not be played until it has
  * been activated again.  This method is used
  * internally by SoundSystem for thread synchronization, and it can not be
  * called directly - please use the cull() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandCull( String sourcename )
     {
         if( soundLibrary != null )
@@ -2294,7 +2294,7 @@ public class SoundSystem
  * method is used internally by SoundSystem for thread synchronization, and it
  * can not be called directly - please use the activate() method instead.
  * @param sourcename Identifier for the source.
- */    
+ */
     private void CommandActivate( String sourcename )
     {
         if( soundLibrary != null )
@@ -2343,15 +2343,15 @@ public class SoundSystem
         }
         ********/
     }
-    
+
 /**
- * Queues a command.  
- * If newCommand is null, all commands are dequeued and executed.  
- * This is automatically used by the sound system, so it is not 
- * likely that a user would ever need to use this method.  
+ * Queues a command.
+ * If newCommand is null, all commands are dequeued and executed.
+ * This is automatically used by the sound system, so it is not
+ * likely that a user would ever need to use this method.
  * See {@link paulscode.sound.CommandObject CommandObject} for more information
- * about commands.  
- * @param newCommand Command to queue, or null to execute commands.  
+ * about commands.
+ * @param newCommand Command to queue, or null to execute commands.
  * @return True if more commands exist, false if queue is empty.
  */
     public boolean CommandQueue( CommandObject newCommand )
@@ -2425,7 +2425,7 @@ public class SoundSystem
                                 break;
                             case CommandObject.RAW_DATA_STREAM:
                                 CommandRawDataStream(
-                                        (AudioFormat) commandObject.objectArgs[0],
+                                        (PAudioFormat) commandObject.objectArgs[0],
                                         commandObject.boolArgs[0],
                                         commandObject.stringArgs[0],
                                         commandObject.floatArgs[0],
@@ -2622,12 +2622,12 @@ public class SoundSystem
             }
         }
     }
-    
+
 /**
- * Searches for and removes any temporary sources that have finished 
- * playing.  This method is used internally by SoundSystem, and it is 
+ * Searches for and removes any temporary sources that have finished
+ * playing.  This method is used internally by SoundSystem, and it is
  * unlikely that the user will ever need to use it.
- */    
+ */
     public void removeTemporarySources()
     {
         synchronized( SoundSystemConfig.THREAD_SYNC )
@@ -2636,12 +2636,12 @@ public class SoundSystem
                 soundLibrary.removeTemporarySources();
         }
     }
-    
+
 /**
  * Returns true if the specified source is playing.
  * @param sourcename Unique identifier of the source to check.
  * @return True or false.
- */    
+ */
     public boolean playing( String sourcename )
     {
         synchronized( SoundSystemConfig.THREAD_SYNC )
@@ -2661,7 +2661,7 @@ public class SoundSystem
 /**
  * Returns true if anything is currently playing.
  * @return True or false.
- */    
+ */
     public boolean playing()
     {
         synchronized( SoundSystemConfig.THREAD_SYNC )
@@ -2692,24 +2692,24 @@ public class SoundSystem
     }
 
 /**
- * Copies and returns the peripheral information from a map of sources.  This 
- * method is used internally by SoundSystem, and it is unlikely that the user 
+ * Copies and returns the peripheral information from a map of sources.  This
+ * method is used internally by SoundSystem, and it is unlikely that the user
  * will ever need to use it.
  * @param sourceMap Sources to copy.
  * @return New map of sources.
- */    
+ */
     private HashMap<String, Source> copySources( HashMap<String,
                                                  Source> sourceMap )
     {
         Set<String> keys = sourceMap.keySet();
-        Iterator<String> iter = keys.iterator();        
+        Iterator<String> iter = keys.iterator();
         String sourcename;
         Source source;
-        
+
         // New map of generic source data:
         HashMap<String, Source> returnMap = new HashMap<String, Source>();
-        
-        
+
+
         // loop through and store information from all the sources:
         while( iter.hasNext() )
         {
@@ -2720,7 +2720,7 @@ public class SoundSystem
         }
         return returnMap;
     }
-    
+
 /**
  * Checks if the specified library type is compatible.
  * @param libraryClass Libary type to check.
@@ -2740,17 +2740,17 @@ public class SoundSystem
         logger.message( "Checking if " +
                         SoundSystemConfig.getLibraryTitle( libraryClass ) +
                         " is compatible...", 0 );
-        
+
         boolean comp = SoundSystemConfig.libraryCompatible( libraryClass );
-        
+
         if( comp )
             logger.message( "...yes", 1 );
         else
             logger.message( "...no", 1 );
-            
+
         return comp;
     }
-    
+
 /**
  * Returns the currently loaded library, or -1 if none.
  * @return Global library identifier
@@ -2759,7 +2759,7 @@ public class SoundSystem
     {
         return( currentLibrary( GET, null ) );
     }
-    
+
 /**
  * Returns false if a sound library is busy initializing.
  * @return True or false.
@@ -2768,7 +2768,7 @@ public class SoundSystem
     {
         return( initialized( GET, XXX ) );
     }
-    
+
 /**
  * Returns the last SoundSystemException thrown, or null if none.
  * @return The last exception.
@@ -2787,7 +2787,7 @@ public class SoundSystem
     {
         lastException( SET, e );
     }
-    
+
 /**
  * Sets or returns the value of boolean 'initialized'.
  * @param action Action to perform (GET or SET).
@@ -2803,7 +2803,7 @@ public class SoundSystem
             return initialized;
         }
     }
-    
+
 /**
  * Sets or returns the value of boolean 'initialized'.
  * @param action Action to perform (GET or SET).
@@ -2820,9 +2820,9 @@ public class SoundSystem
             return currentLibrary;
         }
     }
-    
+
 /**
- * Sets or returns the error code for the last error that occurred.  If no 
+ * Sets or returns the error code for the last error that occurred.  If no
  * errors have occurred, returns SoundSystem.ERROR_NONE
  * @param action Action to perform (GET or SET).
  * @param e New exception if action is SET, otherwise XXX.
@@ -2838,7 +2838,7 @@ public class SoundSystem
             return lastException;
         }
     }
-    
+
 /**
  * Sleeps for the specified number of milliseconds.
  */
@@ -2849,7 +2849,7 @@ public class SoundSystem
             Thread.sleep( milliseconds );
         }
         catch( InterruptedException e ){}
-    }    
+    }
 
 /**
  * Prints a message.
@@ -2860,7 +2860,7 @@ public class SoundSystem
     {
         logger.message( message, indent );
     }
-    
+
 /**
  * Prints an important message.
  * @param message Message to print.
@@ -2870,7 +2870,7 @@ public class SoundSystem
     {
         logger.importantMessage( message, indent );
     }
-    
+
 /**
  * Prints the specified message if error is true.
  * @param error True or False.
@@ -2882,7 +2882,7 @@ public class SoundSystem
     {
         return logger.errorCheck( error, className, message, indent );
     }
-    
+
 /**
  * Prints an error message.
  * @param message Message to print.

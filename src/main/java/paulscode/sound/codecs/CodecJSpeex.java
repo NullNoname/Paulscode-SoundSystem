@@ -5,7 +5,7 @@ import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
-import javax.sound.sampled.AudioFormat;
+import paulscode.sound.PAudioFormat;
 
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
@@ -150,7 +150,7 @@ public class CodecJSpeex implements ICodec
 /**
  * Format the converted audio will be in.
  */
-    private AudioFormat myAudioFormat = null;
+    private PAudioFormat myAudioFormat = null;
 
 /**
  * Global identifier for when the container speex file is ogg.
@@ -285,11 +285,11 @@ public class CodecJSpeex implements ICodec
             return false;
         }
         speexDecoder = new SpeexDecoder();
-        
+
         if( !processHeader() )
             return false;
 
-        myAudioFormat = new AudioFormat( (float) sampleRate, 16, channels,
+        myAudioFormat = new PAudioFormat( sampleRate, 16, channels,
                                          true, false );
 
         endOfStream( SET, false );
@@ -691,7 +691,7 @@ public class CodecJSpeex implements ICodec
  * readAll() methods.
  * @return Information wrapped into an AudioFormat context.
  */
-    public AudioFormat getAudioFormat()
+    public PAudioFormat getAudioFormat()
     {
         return myAudioFormat;
     }

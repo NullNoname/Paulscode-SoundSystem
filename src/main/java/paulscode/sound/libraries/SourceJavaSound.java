@@ -1,20 +1,22 @@
 package paulscode.sound.libraries;
 
 import java.util.LinkedList;
+
 import javax.sound.sampled.AudioFormat;
 
 import paulscode.sound.Channel;
 import paulscode.sound.FilenameURL;
 import paulscode.sound.ListenerData;
+import paulscode.sound.AudioFormatConverter;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.Source;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.Vector3D;
 
 /**
- * The SourceJavaSound class provides an interface to the JavaSound library.  
- * For more information about the Java Sound API, please visit 
- * http://java.sun.com/products/java-media/sound/ 
+ * The SourceJavaSound class provides an interface to the JavaSound library.
+ * For more information about the Java Sound API, please visit
+ * http://java.sun.com/products/java-media/sound/
  *<br><br>
  *<b><i>    SoundSystem LibraryJavaSound License:</b></i><br><b><br>
  *    You are free to use this library for any purpose, commercial or otherwise.
@@ -54,17 +56,17 @@ public class SourceJavaSound extends Source
  * The source's basic Channel type-cast to a ChannelJavaSound.
  */
     protected ChannelJavaSound channelJavaSound = (ChannelJavaSound) channel;
-    
+
 /**
- * Handle to the listener information.  
+ * Handle to the listener information.
  */
     public ListenerData listener;
-    
+
 /**
- * Panning between left and right speaker (float between -1.0 and 1.0).  
+ * Panning between left and right speaker (float between -1.0 and 1.0).
  */
     private float pan = 0.0f;
-    
+
 /**
  * Constructor:  Creates a new source using the specified parameters.
  * @param listener Handle to information about the listener.
@@ -90,12 +92,12 @@ public class SourceJavaSound extends Source
         super( priority, toStream, toLoop, sourcename, filenameURL, soundBuffer,
                x, y, z, attModel, distOrRoll, temporary );
         libraryType = LibraryJavaSound.class;
-        
+
         // point handle to the listener information:
         this.listener = listener;
         positionChanged();
     }
-    
+
 /**
  * Constructor:  Creates a new source matching the specified source.
  * @param listener Handle to information about the listener.
@@ -130,7 +132,7 @@ public class SourceJavaSound extends Source
                             boolean priority, String sourcename, float x,
                             float y, float z, int attModel, float distOrRoll )
     {
-        super( audioFormat, priority, sourcename, x, y, z, attModel,
+        super( AudioFormatConverter.convertAudioFormat(audioFormat), priority, sourcename, x, y, z, attModel,
                distOrRoll );
         libraryType = LibraryJavaSound.class;
 
@@ -138,19 +140,19 @@ public class SourceJavaSound extends Source
         this.listener = listener;
         positionChanged();
     }
-    
-    
+
+
 /**
  * Shuts the source down and removes references to all instantiated objects.
  */
     @Override
     public void cleanup()
     {
-        super.cleanup();        
+        super.cleanup();
     }
-    
+
 /**
- * Changes the peripheral information about the source using the specified 
+ * Changes the peripheral information about the source using the specified
  * parameters.
  * @param priority Setting this to true will prevent other sounds from overriding this one.
  * @param toStream Setting this to true will create a streaming source.
@@ -179,7 +181,7 @@ public class SourceJavaSound extends Source
             channelJavaSound.setLooping( toLoop );
         positionChanged();
     }
-    
+
 /**
  * Called every time the listener's position or orientation changes.
  */
@@ -201,7 +203,7 @@ public class SourceJavaSound extends Source
         super.setVelocity( x, y, z );
         positionChanged();
     }
-    
+
 /**
  * Moves the source to the specified position.
  * @param x X coordinate to move to.
@@ -214,7 +216,7 @@ public class SourceJavaSound extends Source
         super.setPosition( x, y, z );
         positionChanged();
     }
-    
+
 /**
  * Updates the pan and gain.
  */
@@ -247,9 +249,9 @@ public class SourceJavaSound extends Source
         super.setAttenuation( model );
         calculateGain();
     }
-    
+
 /**
- * Sets this source's fade distance or rolloff factor, depending on the 
+ * Sets this source's fade distance or rolloff factor, depending on the
  * attenuation model.
  * @param dr New value for fade distance or rolloff factor.
  */
@@ -259,7 +261,7 @@ public class SourceJavaSound extends Source
         super.setDistOrRoll( dr );
         calculateGain();
     }
-    
+
 /**
  * Plays the source on the specified channel.
  * @param c Channel to play on.
@@ -273,31 +275,31 @@ public class SourceJavaSound extends Source
                 toPlay = true;
             return;
         }
-        
+
         if( c == null )
         {
             errorMessage( "Unable to play source, because channel was null" );
             return;
         }
-        
+
         boolean newChannel = (channel != c);
         if( channel != null && channel.attachedSource != this )
             newChannel = true;
 
         boolean wasPaused = paused();
         boolean wasStopped = stopped();
-        
+
         super.play( c );
-        
+
         channelJavaSound = (ChannelJavaSound) channel;
-        
+
         // Make sure the channel exists:
         // check if we are already on this channel:
         if( newChannel )
         {
             if( channelJavaSound != null )
                 channelJavaSound.setLooping( toLoop );
-            
+
             if( !toStream )
             {
                 // This is not a streaming source, so make sure there is
@@ -307,12 +309,12 @@ public class SourceJavaSound extends Source
                     errorMessage( "No sound buffer to play" );
                     return;
                 }
-                
+
                 channelJavaSound.attachBuffer( soundBuffer );
             }
         }
         positionChanged();  // set new pan and gain
-        
+
         // See if we are already playing:
         if( wasStopped || !playing() )
         {
@@ -323,7 +325,7 @@ public class SourceJavaSound extends Source
             channel.play();
         }
     }
-    
+
 /**
  * Queues up the initial stream-buffers for the stream.
  * @return False if the end of the stream was reached.
@@ -371,7 +373,7 @@ public class SourceJavaSound extends Source
 
                 preLoadBuffers.add( soundBuffer.audioData );
             }
-            channelJavaSound.resetStream( codec.getAudioFormat() );
+            channelJavaSound.resetStream( AudioFormatConverter.convertAudioFormat(codec.getAudioFormat()) );
         }
         positionChanged();
 
@@ -380,9 +382,9 @@ public class SourceJavaSound extends Source
         preLoad = false;
         return true;
     }
-    
+
 /**
- * Calculates the gain for this source based on its attenuation model and 
+ * Calculates the gain for this source based on its attenuation model and
  * distance from the listener.
  */
     public void calculateGain()
@@ -390,10 +392,10 @@ public class SourceJavaSound extends Source
         float distX = position.x - listener.position.x;
         float distY = position.y - listener.position.y;
         float distZ = position.z - listener.position.z;
-        
+
         distanceFromListener = (float) Math.sqrt( distX*distX + distY*distY
                                                   + distZ*distZ );
-        
+
         // Calculate the source's gain using the specified attenuation model:
         switch( attModel )
         {
@@ -420,13 +422,13 @@ public class SourceJavaSound extends Source
                 {
                     float tweakFactor = 0.0005f;
                     float attenuationFactor = distOrRoll * distanceFromListener
-                                              * distanceFromListener 
+                                              * distanceFromListener
                                               * tweakFactor;
                     // Make sure we don't do a division by zero:
                     // (rolloff should NEVER be negative)
                     if( attenuationFactor < 0 )
                         attenuationFactor = 0;
-                    
+
                     gain = 1.0f / ( 1 + attenuationFactor );
                 }
                 break;
@@ -439,18 +441,18 @@ public class SourceJavaSound extends Source
             gain = 1.0f;
         if( gain < 0.0f )
             gain = 0.0f;
-        
+
         gain *= sourceVolume * SoundSystemConfig.getMasterGain()
-                * (float) Math.abs( fadeOutGain ) * fadeInGain;
+                * Math.abs( fadeOutGain ) * fadeInGain;
 
         // update the channel's gain:
         if( channel != null && channel.attachedSource == this &&
             channelJavaSound != null )
             channelJavaSound.setGain( gain );
     }
-    
+
 /**
- * Calculates the panning for this source based on its position in relation to 
+ * Calculates the panning for this source based on its position in relation to
  * the listener.
  */
     public void calculatePan()
@@ -460,10 +462,10 @@ public class SourceJavaSound extends Source
         float x = position.dot( position.subtract( listener.position ), side );
         float z = position.dot( position.subtract( listener.position ),
                                 listener.lookAt );
-        side = null;        
+        side = null;
         float angle = (float) Math.atan2( x, z );
         pan = (float) - Math.sin( angle );
-        
+
         if( channel != null && channel.attachedSource == this &&
             channelJavaSound != null )
         {
@@ -505,7 +507,7 @@ public class SourceJavaSound extends Source
                 vls = min( vls, SS / DF );
                 float newPitch = pitch * ( SS * DV - DF * vls ) /
                                          (SS * DV - DF * vss );
-                
+
                 if( newPitch < 0.5f )
                     newPitch = 0.5f;
                 else if( newPitch > 2.0f )
