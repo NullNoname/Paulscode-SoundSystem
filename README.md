@@ -1,11 +1,20 @@
-# PaulsCode 3D Sound System
-[![](https://jitpack.io/v/NullNoname/Paulscode-SoundSystem.svg)](https://jitpack.io/#NullNoname/Paulscode-SoundSystem)
-
-This repository is an unofficial mirror of [Paul Lamb's 3D Sound System](http://www.paulscode.com/forum/index.php?topic=4.0).
+# PaulsCode 3D Sound System Unoffical Android Branch
+This repository is an unofficial Android port of [Paul Lamb's 3D Sound System](http://www.paulscode.com/forum/index.php?topic=4.0).
 Most optional components except JOAL and jPCT-related codes are included.
 
+This port still works in PC, and this repository contain nothing for Android. To actually being able to play audio in Android, you will need to use [LibraryAudioTrack](https://github.com/NullNoname/paudiotrack).
+
+This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
+
+## Codec Compatibility
+* CodecJOrbis: Works
+* CodecJSpeex: Works
+* CodecIBXM: Only generates garbage audio. I don't know why.
+* CodecWav: Not ported to Android because it has heavy usage of JavaSound API.
+* CodecJOgg: Same as CodecWav. Need JavaSound to work.
+
 ## External Dependencies
-### LWJGL
+### LWJGL (PC only)
 Required for playing sound through LibraryLWJGLOpenAL.
 ```
 <dependency>
@@ -20,7 +29,7 @@ Required for playing sound through LibraryLWJGLOpenAL.
 </dependency>
 ```
 
-### J-Ogg
+### J-Ogg (PC only)
 Required for loading OGG audio through CodecJOgg. It is faster than JOrbis, but not compatible with several OGG files. Sometimes processing an existing OGG file though a converter make it compatible.
 ```
 <dependency>
@@ -92,6 +101,10 @@ Required for loading Speex audio though CodecJSpeex.
 
 ## License
 * Unless otherwise noted, most codes and documents of this library are licensed under The SoundSystem License. Please see "SoundSystem License.txt" for more information.
+
+* PAudioFormat is a modified class of AudioFormat from OpenJDK 6-b14. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same OpenJDK. PAudioFormat is licensed under [GNU General Public License, version 2, with the Classpath Exception](http://openjdk.java.net/legal/gplv2+ce.html).
+
+* AudioFormatConverter class is licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
 
 * LWJGL related codes (ChannelLWJGLOpenAL, LibraryLWJGLOpenAL, and SourceLWJGLOpenAL) are licensed under SoundSystem LibraryLWJGLOpenAL License. Please see "SoundSystem LibraryLWJGLOpenAL License.txt" and "LWJGL License.txt" for more information.
 

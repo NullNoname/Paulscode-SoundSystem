@@ -34,6 +34,12 @@ import java.util.Map;
  * which is missing from Android but used sometimes in PaulsCode 3D Sound System.
  * When needed, <code>AudioFormatConverter</code> can be used to convert between this and the real <code>AudioFormat</code>.
  * <p>
+ * This code was copy-pasted and modified from OpenJDK 6-b14.
+ * The "NOT_SPECIFIED" constant was copied from <code>AudioSystem</code> from the same OpenJDK.
+ * <p>
+ * License is GNU General Public License, version 2, with the Classpath Exception.
+ * http://openjdk.java.net/legal/gplv2+ce.html
+ * <hr>
  * <code>AudioFormat</code> is the class that specifies a particular arrangement of data in a sound stream.
  * By examing the information stored in the audio format, you can discover how to interpret the bits in the
  * binary sound data.
