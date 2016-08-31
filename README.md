@@ -102,9 +102,9 @@ Required for loading Speex audio though CodecJSpeex.
 ## License
 * Unless otherwise noted, most codes and documents of this library are licensed under The SoundSystem License. Please see "SoundSystem License.txt" for more information.
 
-* PAudioFormat is a modified class of AudioFormat from OpenJDK 6-b14. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same OpenJDK. PAudioFormat is licensed under [GNU General Public License, version 2, with the Classpath Exception](http://openjdk.java.net/legal/gplv2+ce.html).
+* PAudioFormat is a modified class of AudioFormat from Apache Harmony. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same codebase. PAudioFormat is licensed under Apache License Version 2.0. Please see "AudioFormatConverter License.txt" for more information.
 
-* AudioFormatConverter class is licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
+* AudioFormatConverter class is licensed under Unlicense. Please see "PAudioFormat License.txt" for more information.
 
 * LWJGL related codes (ChannelLWJGLOpenAL, LibraryLWJGLOpenAL, and SourceLWJGLOpenAL) are licensed under SoundSystem LibraryLWJGLOpenAL License. Please see "SoundSystem LibraryLWJGLOpenAL License.txt" and "LWJGL License.txt" for more information.
 
