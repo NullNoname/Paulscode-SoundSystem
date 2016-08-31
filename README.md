@@ -6,13 +6,14 @@ This port still works in PC, and this repository contain nothing for Android. To
 
 This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
 
-## Codec Compatibility
+## Android Codec Compatibility
 * CodecJOrbis: Works
 * CodecJSpeex: Works
 * CodecIBXM: Only generates garbage audio. I don't know why.
 * CodecWav: Not ported to Android because it has heavy usage of JavaSound API.
 * CodecJOgg: Same as CodecWav. Need JavaSound to work.
-
+* MIDI: Don't even try. I'm sure it will crash and burn.
+ 
 ## External Dependencies
 ### LWJGL (PC only)
 Required for playing sound through LibraryLWJGLOpenAL.
@@ -29,7 +30,7 @@ Required for playing sound through LibraryLWJGLOpenAL.
 </dependency>
 ```
 
-### J-Ogg (PC only)
+### J-Ogg (PC only for now)
 Required for loading OGG audio through CodecJOgg. It is faster than JOrbis, but not compatible with several OGG files. Sometimes processing an existing OGG file though a converter make it compatible.
 ```
 <dependency>
@@ -59,7 +60,7 @@ Required for loading OGG audio through CodecJOrbis. It is more compatible than J
 </dependencies>
 ```
 
-### IBXM
+### IBXM (PC only for now)
 Required for loading Protracker MOD and XM files though CodecIBXM. Newer releases of IBXM are not compatible because of API changes and feature removals.
 ```
 <repositories>
@@ -102,9 +103,9 @@ Required for loading Speex audio though CodecJSpeex.
 ## License
 * Unless otherwise noted, most codes and documents of this library are licensed under The SoundSystem License. Please see "SoundSystem License.txt" for more information.
 
-* PAudioFormat is a modified class of AudioFormat from Apache Harmony. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same codebase. PAudioFormat is licensed under Apache License Version 2.0. Please see "AudioFormatConverter License.txt" for more information.
+* PAudioFormat is a modified class of AudioFormat from Apache Harmony. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same codebase. PAudioFormat is licensed under Apache License Version 2.0. Please see "PAudioFormat License.txt" for more information.
 
-* AudioFormatConverter class is licensed under Unlicense. Please see "PAudioFormat License.txt" for more information.
+* AudioFormatConverter class is licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
 
 * LWJGL related codes (ChannelLWJGLOpenAL, LibraryLWJGLOpenAL, and SourceLWJGLOpenAL) are licensed under SoundSystem LibraryLWJGLOpenAL License. Please see "SoundSystem LibraryLWJGLOpenAL License.txt" and "LWJGL License.txt" for more information.
 
