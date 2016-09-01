@@ -984,6 +984,9 @@ public class ChannelJavaSound extends Channel
             case SoundSystemConfig.TYPE_STREAMING:
                 if( sourceDataLine == null )
                     return false;
+                // Check if we have something to play
+                if(streamBuffers == null || streamBuffers.isEmpty())
+                    return false;
                 return sourceDataLine.isActive();
             default:
                 return false;

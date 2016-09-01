@@ -108,6 +108,11 @@ public class CodecIBXM implements ICodec
     private static final boolean XXX = false;
 
 /**
+ * Default sample rate
+ */
+    private static int defaultSampleRate = 48000;
+
+/**
  * True if there is no more data to read in.
  */
     private boolean endOfStream = false;
@@ -127,6 +132,11 @@ public class CodecIBXM implements ICodec
  * reverse-ordered before returning it from methods read() and readAll().
  */
     private boolean reverseBytes = false;
+
+/**
+ * Sample rate to use
+ */
+    private int sampleRate;
 
 /**
  * IBXM decoder.
@@ -154,11 +164,42 @@ public class CodecIBXM implements ICodec
     private SoundSystemLogger logger;
 
 /**
+ * @return Default sample rate used for every CodecIBXM instance
+ */
+    public static int getDefaultSampleRate() {
+        return defaultSampleRate;
+    }
+
+/**
+ * Set the default sample rate
+ * @param defaultSampleRate Default sample rate used for every CodecIBXM instance
+ */
+    public static void setDefaultSampleRate(int defaultSampleRate) {
+        CodecIBXM.defaultSampleRate = defaultSampleRate;
+    }
+
+/**
  * Constructor:  Grabs a handle to the logger.
  */
     public CodecIBXM()
     {
         logger = SoundSystemConfig.getLogger();
+        sampleRate = defaultSampleRate;
+    }
+
+/**
+ * @return Sample rate of IBXM
+ */
+    public int getSampleRate() {
+        return sampleRate;
+    }
+
+/**
+ * Change the sample rate to use. Change will take effect when new song is loaded.
+ * @param sampleRate Sample rate of IBXM
+ */
+    public void setSampleRate(int sampleRate) {
+        this.sampleRate = sampleRate;
     }
 
 /**
@@ -207,9 +248,9 @@ public class CodecIBXM implements ICodec
         }
 
         if( ibxm == null )
-            ibxm = new IBXM( 48000 );
+            ibxm = new IBXM( sampleRate );
         if( myAudioFormat == null )
-            myAudioFormat = new PAudioFormat( 48000, 16, 2, true, true );
+            myAudioFormat = new PAudioFormat( sampleRate, 16, 2, true, true );
 
         try
         {
