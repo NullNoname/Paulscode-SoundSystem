@@ -4,6 +4,25 @@
 This repository is an unofficial mirror of [Paul Lamb's 3D Sound System](http://www.paulscode.com/forum/index.php?topic=4.0).
 Most optional components except JOAL and jPCT-related codes are included.
 
+If you are looking for Android-friendly branch, [click here](https://github.com/NullNoname/Paulscode-SoundSystem/tree/droid).
+
+## Getting this library from JitPack
+Add the JitPack repository to your pom.xml, and add a dependency.
+```
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.NullNoname</groupId>
+    <artifactId>Paulscode-SoundSystem</artifactId>
+    <version>2013.04.17-unofficial</version>
+</dependency>
+```
+
 ## External Dependencies
 ### LWJGL
 Required for playing sound through LibraryLWJGLOpenAL.
