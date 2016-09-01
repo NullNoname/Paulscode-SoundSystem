@@ -9,7 +9,7 @@ This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat
 ## Android Codec Compatibility
 * CodecJOrbis: Works
 * CodecJSpeex: Works
-* CodecIBXM: Only generates garbage audio. I don't know why.
+* CodecIBXM: Works
 * CodecWav: Not ported to Android because it has heavy usage of JavaSound API.
 * CodecJOgg: Same as CodecWav. Need JavaSound to work.
 * MIDI: Don't even try. I'm sure it will crash and burn.
@@ -60,7 +60,7 @@ Required for loading OGG audio through CodecJOrbis. It is more compatible than J
 </dependencies>
 ```
 
-### IBXM (PC only for now)
+### IBXM
 Required for loading Protracker MOD and XM files though CodecIBXM. Newer releases of IBXM are not compatible because of API changes and feature removals.
 ```
 <repositories>
