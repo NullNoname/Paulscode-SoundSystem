@@ -1,6 +1,5 @@
 package paulscode.sound;
 
-import java.net.URL;
 import paulscode.sound.PAudioFormat;
 
 /**
@@ -65,9 +64,10 @@ public interface ICodec
  * stream opened in its place.  This method is used internally by SoundSystem
  * not only to initialize a stream, but also to rewind streams and to switch
  * stream sources on the fly.
+ * @param filenameURL Filename/URL to read
  * @return False if an error occurred or if end of stream was reached.
  */
-    public boolean initialize( URL url );
+    public boolean initialize( FilenameURL filenameURL );
 
 /**
  * Should return false if the stream is busy initializing.  To prevent bad

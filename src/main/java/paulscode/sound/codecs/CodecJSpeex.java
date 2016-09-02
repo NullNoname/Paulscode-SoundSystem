@@ -4,9 +4,8 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
+import paulscode.sound.FilenameURL;
 import paulscode.sound.PAudioFormat;
-
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
@@ -258,25 +257,25 @@ public class CodecJSpeex implements ICodec
 /**
  * Prepares an audio stream to read from.  If another stream is already opened,
  * it will be closed and a new audio stream opened in its place.
- * @param url URL to an audio file to stream from.
+ * @param filenameURL FilenameURL to an audio file to stream from.
  * @return False if an error occurred or if end of stream was reached.
  */
-    public boolean initialize( URL url )
+    public boolean initialize( FilenameURL filenameURL )
     {
         initialized( SET, false );
         cleanup();
 
-        if( url == null )
+        if( filenameURL == null )
         {
-            errorMessage( "url null in method 'initialize'" );
+            errorMessage( "filenameURL null in method 'initialize'" );
             cleanup();
             return false;
         }
 
         try
         {
-            is = url.openStream();
-            dis =  new DataInputStream( url.openStream() );
+            is = filenameURL.openStream();
+            dis =  new DataInputStream( filenameURL.openStream() );
         }
         catch( IOException ioe )
         {

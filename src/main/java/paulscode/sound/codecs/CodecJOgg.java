@@ -2,7 +2,6 @@ package paulscode.sound.codecs;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -12,12 +11,13 @@ import javax.sound.sampled.AudioInputStream;
 
 
 
-// From the j-ogg library, http://www.j-ogg.de
-import de.jarnbjo.ogg.CachedUrlStream;
+
+
 import de.jarnbjo.ogg.EndOfOggStreamException;
 import de.jarnbjo.ogg.LogicalOggStream;
 import de.jarnbjo.vorbis.IdentificationHeader;
 import de.jarnbjo.vorbis.VorbisStream;
+import paulscode.sound.FilenameURL;
 import paulscode.sound.ICodec;
 import paulscode.sound.PAudioFormat;
 import paulscode.sound.AudioFormatConverter;
@@ -113,11 +113,6 @@ public class CodecJOgg implements ICodec
     private boolean reverseBytes = false;
 
 /**
- * Cached URL stream, used for reading .ogg files.
- */
-    private CachedUrlStream cachedUrlStream = null;
-
-/**
  * Logical Ogg stream, used for reading .ogg files.
  */
     private LogicalOggStream myLogicalOggStream = null;
@@ -177,17 +172,17 @@ public class CodecJOgg implements ICodec
 /**
  * Prepares an audio stream to read from.  If another stream is already opened,
  * it will be closed and a new audio stream opened in its place.
- * @param url URL to an ogg file to stream from.
+ * @param filenameURL FilenameURL to an ogg file to stream from.
  * @return False if an error occurred or if end of stream was reached.
  */
-    public boolean initialize( URL url )
+    public boolean initialize( FilenameURL filenameURL )
     {
         initialized( SET, false );
         cleanup();
 
-        if( url == null )
+        if( filenameURL == null )
         {
-            errorMessage( "url null in method 'initialize'" );
+            errorMessage( "filenameURL null in method 'initialize'" );
             cleanup();
             return false;
         }
@@ -195,9 +190,10 @@ public class CodecJOgg implements ICodec
         try
         {
             // Create all the streams:
-            cachedUrlStream = new CachedUrlStream( url );
-            myLogicalOggStream = (LogicalOggStream)
-                  cachedUrlStream.getLogicalStreams().iterator().next();
+            //TODO: CachedUrlStream uses URL directly.
+            //cachedUrlStream = new CachedUrlStream( url );
+        	JOggCustomCachedUrlStream cachedUrlStream = new JOggCustomCachedUrlStream(filenameURL);
+            myLogicalOggStream = (LogicalOggStream) cachedUrlStream.getLogicalStreams().iterator().next();
             myVorbisStream = new VorbisStream( myLogicalOggStream );
             myOggInputStream = new OggInputStream( myVorbisStream );
 

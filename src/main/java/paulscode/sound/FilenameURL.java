@@ -1,5 +1,7 @@
 package paulscode.sound;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -134,12 +136,29 @@ public class FilenameURL
     }
 
 /**
+ * Open a new InputStream of this file using the current file input provider.
+ * @return InputStream
+ * @throws IOException If any I/O error occurs
+ */
+    public InputStream openStream() throws IOException {
+        return SoundSystemConfig.getFileInputProvider().openStream(this);
+    }
+
+/**
+ * Get the file size of this file using the current file input provider.
+ * @return File size in bytes, or -1 if unknown or error
+ */
+    public int getContentLength() {
+        return SoundSystemConfig.getFileInputProvider().getContentLength(this);
+    }
+
+/**
  * Prints an error message.
  * @param message Message to print.
  */
     private void errorMessage( String message )
     {
-        logger.errorMessage( "MidiChannel", message, 0 );
+        logger.errorMessage( "FilenameURL", message, 0 );
     }
 
 /**

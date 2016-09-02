@@ -56,9 +56,9 @@ public class SoundSystemConfig
 //  END GLOBAL THREAD SYNCHRONIZATION
 
 //  GLOBAL IDENTIFIERS
-    
+
 /**
- * A normal (non-streaming) source.  Also used to define a Channel type as 
+ * A normal (non-streaming) source.  Also used to define a Channel type as
  * normal.
  */
     public static final int TYPE_NORMAL          = 0;
@@ -66,50 +66,56 @@ public class SoundSystemConfig
  * A streaming source.  Also used to define a Channel type as streaming.
  */
     public static final int TYPE_STREAMING       = 1;
-    
+
 /**
- * Global identifier for no attenuation.  Attenuation is how a source's volume 
- * fades with distance.  When there is no attenuation, a source's volume 
+ * Global identifier for no attenuation.  Attenuation is how a source's volume
+ * fades with distance.  When there is no attenuation, a source's volume
  * remains constaint regardles of distance.
  */
     public static final int ATTENUATION_NONE     = 0;  // no attenuation
 /**
- * Global identifier for rolloff attenuation.  Rolloff attenuation is a 
- * realistic attenuation model, which uses a rolloff factor to determine how 
- * quickly a source fades with distance.  A smaller rolloff factor will fade at 
- * a further distance, and a rolloff factor of 0 will never fade.  NOTE: In 
+ * Global identifier for rolloff attenuation.  Rolloff attenuation is a
+ * realistic attenuation model, which uses a rolloff factor to determine how
+ * quickly a source fades with distance.  A smaller rolloff factor will fade at
+ * a further distance, and a rolloff factor of 0 will never fade.  NOTE: In
  * OpenAL, rolloff attenuation only works for monotone sounds.
  */
     public static final int ATTENUATION_ROLLOFF  = 1;  // logrithmic attenuation
 /**
  * Global identifier for linear attenuation.  Linear attenuation is less
- * realistic than rolloff attenuation, but it allows the user to specify a 
+ * realistic than rolloff attenuation, but it allows the user to specify a
  * maximum "fade distance" where a source's volume becomes zero.
  */
     public static final int ATTENUATION_LINEAR   = 2;  // linear attenuation
-    
+
 /**
  * A Regular expression for determining if a file's extension is MIDI.
  */
     public static String EXTENSION_MIDI = ".*[mM][iI][dD][iI]?$";
-    
+
 /**
  * A Regular expression for determining if a path is an online URL.
  */
     public static String PREFIX_URL = "^[hH][tT][tT][pP]://.*";
-    
+
 //  END GLOBAL IDENTIFIERS
- 
-    
+
+
 //  PRIVATE STATIC VARIABLES
 
 /**
- * Handle to the message logger.  The default logger can be changed by 
- * overridding the {@link paulscode.sound.SoundSystemLogger SoundSystemLogger} 
- * class and calling the setLogger() method (must be done BEFORE instantiating 
+ * Handle to the message logger.  The default logger can be changed by
+ * overridding the {@link paulscode.sound.SoundSystemLogger SoundSystemLogger}
+ * class and calling the setLogger() method (must be done BEFORE instantiating
  * the SoundSystem class!)
  */
     private static SoundSystemLogger logger = null;
+
+/**
+ * Handle to the file input provider, which produces InputStream of the requested file.
+ * The default is DefaultFileInputProvider, which uses URL#openStream().
+ */
+    private static FileInputProvider fileInputProvider = null;
 
 /**
  * List of library types in their order of priority.
@@ -129,16 +135,16 @@ public class SoundSystemConfig
  * For synchronizing access to the streamListeners list.
  */
     private static final Object streamListenersLock = new Object();
-    
+
 /**
  * Maximum number of normal (non-streaming) channels that can be created.
- * NOTE: JavaSound may require the total number of channels (non-streaming + 
+ * NOTE: JavaSound may require the total number of channels (non-streaming +
  * streaming) to be 32.
  */
     private static int numberNormalChannels = 28;
 /**
  * Maximum number of streaming channels that can be created.
- * NOTE: JavaSound may require the total number of channels (non-streaming + 
+ * NOTE: JavaSound may require the total number of channels (non-streaming +
  * streaming) to be 32.
  */
     private static int numberStreamingChannels = 4;
@@ -147,7 +153,7 @@ public class SoundSystemConfig
  */
     private static float masterGain = 1.0f;
 /**
- * Attenuation model to use if not specified.  Attenuation is how a source's  
+ * Attenuation model to use if not specified.  Attenuation is how a source's
  * volume fades with distance.
  */
     private static int defaultAttenuationModel = ATTENUATION_ROLLOFF;
@@ -171,7 +177,7 @@ public class SoundSystemConfig
  * Package where the sound files are located (must be followed by '/').
  */
     private static String soundFilesPackage = "Sounds/";
-    
+
 /**
  * Number of bytes to load at a time when streaming.
  */
@@ -189,9 +195,9 @@ public class SoundSystemConfig
  */
     private static boolean streamQueueFormatsMatch = false;
 /**
- * The maximum number of bytes to read in for (non-streaming) files.  
- * Increase this value if non-streaming sounds are getting cut off.  
- * Decrease this value if large sound files are causing lag during load time.  
+ * The maximum number of bytes to read in for (non-streaming) files.
+ * Increase this value if non-streaming sounds are getting cut off.
+ * Decrease this value if large sound files are causing lag during load time.
  */
     private static int maxFileSize = 268435456;
 /**
@@ -215,9 +221,9 @@ public class SoundSystemConfig
     private static String overrideMIDISynthesizer = "";
 
 //  END PRIVATE STATIC VARIABLES
-    
+
 // THESE TWO METHODS PROVIDE INFORMATION ABOUT THE INDIVIDUAL SOUND LIBRARIES
-    
+
 /**
  * Adds an entry to the list of library types.  This method has no effect if
  * the specified library type is already in the list of libraries.
@@ -242,7 +248,7 @@ public class SoundSystemConfig
         if( !libraries.contains( libraryClass ) )
             libraries.add( libraryClass );
     }
-    
+
 /**
  * Removes the specified library from the list of library types.
  * @param libraryClass Derivitive of class 'Library'.
@@ -264,7 +270,7 @@ public class SoundSystemConfig
     {
         return libraries;
     }
-    
+
 /**
  * Checks if the specified library class is compatible on the user's machine.
  * @param libraryClass Library type to check.
@@ -349,7 +355,7 @@ public class SoundSystemConfig
                           "'Library' in method 'getLibraryDescription'" );
             return null;
         }
-        
+
         Object o = runMethod( libraryClass, "getDescription",
                                      new Class[0], new Object[0] );
         if( o == null )
@@ -397,21 +403,21 @@ public class SoundSystemConfig
 // END LIBRARY INFORMATION
 
 // Use the following methods to interface the private variables above:
-    
+
 // STATIC NONSYNCHRONIZED INTERFACE METHODS
 /**
- * Changes the message logger to use for handling status messages, warnings, 
- * and error messages.  This method should only be called BEFORE instantiating 
- * the SoundSystem class!  If this method is called after the SoundSystem has 
- * been created, there will be handles floating around to two different 
- * loggers, and the results will be undesirable.  This method can be used to 
- * change how messages are handled.  First, the 
- * {@link paulscode.sound.SoundSystemLogger SoundSystemLogger} class should be 
- * extended and methods overriden to change how messages are handled.  Then, 
- * the overridden class should be instantiated, and a call made to 
- * SoundSystemConfig.setLogger() before creating the SoundSystem object.  
- * If an alternate logger is not set by the user before the SoundSystem is 
- * instantiated, then an instance of the base SoundSystemLogger class will be 
+ * Changes the message logger to use for handling status messages, warnings,
+ * and error messages.  This method should only be called BEFORE instantiating
+ * the SoundSystem class!  If this method is called after the SoundSystem has
+ * been created, there will be handles floating around to two different
+ * loggers, and the results will be undesirable.  This method can be used to
+ * change how messages are handled.  First, the
+ * {@link paulscode.sound.SoundSystemLogger SoundSystemLogger} class should be
+ * extended and methods overriden to change how messages are handled.  Then,
+ * the overridden class should be instantiated, and a call made to
+ * SoundSystemConfig.setLogger() before creating the SoundSystem object.
+ * If an alternate logger is not set by the user before the SoundSystem is
+ * instantiated, then an instance of the base SoundSystemLogger class will be
  * used by default.
  * @param l Handle to a message logger.
  */
@@ -427,14 +433,30 @@ public class SoundSystemConfig
     {
         return logger;
     }
-    
+
 //  STATIC SYNCHRONIZED INTERFACE METHODS
-    
+
 /**
- * Sets the maximum number of normal (non-streaming) channels that can be 
- * created.  Streaming channels are created first, so the higher the maximum 
- * number of streaming channels is set, the fewer non-streaming channels will 
- * be available.  If unable to create the number of channels specified, 
+ * Get the current IFileInputProvider to use for opening InputStream of files.
+ * @return IFileInputProvider
+ */
+	public static FileInputProvider getFileInputProvider() {
+		return fileInputProvider;
+	}
+
+/**
+ * Changes the IFileInputProvider to use for opening InputStream of files.
+ * @param fileInputProvider Handle to IFileInputProvider
+ */
+	public static void setFileInputProvider(FileInputProvider fileInputProvider) {
+		SoundSystemConfig.fileInputProvider = fileInputProvider;
+	}
+
+/**
+ * Sets the maximum number of normal (non-streaming) channels that can be
+ * created.  Streaming channels are created first, so the higher the maximum
+ * number of streaming channels is set, the fewer non-streaming channels will
+ * be available.  If unable to create the number of channels specified,
  * SoundSystem will create as many as possible.
  * NOTE: Some sound library pluggins may require the total number of channels
  * (non-streaming + streaming) to be 32.
@@ -444,9 +466,9 @@ public class SoundSystemConfig
     {
         numberNormalChannels = number;
     }
-    
+
 /**
- * Returns the maximum number of normal (non-streaming) channels that can be 
+ * Returns the maximum number of normal (non-streaming) channels that can be
  * created.
  * @return Maximum non-streaming channels.
  */
@@ -454,12 +476,12 @@ public class SoundSystemConfig
     {
         return numberNormalChannels;
     }
-    
+
 /**
- * Sets the maximum number of streaming channels that can be created.  
- * Streaming channels are created first, so the higher the maximum number of 
- * streaming channels is set, the fewer non-streaming channels will 
- * be available.  If unable to create the number of channels specified, 
+ * Sets the maximum number of streaming channels that can be created.
+ * Streaming channels are created first, so the higher the maximum number of
+ * streaming channels is set, the fewer non-streaming channels will
+ * be available.  If unable to create the number of channels specified,
  * SoundSystem will create as many as possible.
  * NOTE: Some sound library pluggins may require the total number of channels
  * (non-streaming + streaming) to be 32.
@@ -469,7 +491,7 @@ public class SoundSystemConfig
     {
         numberStreamingChannels = number;
     }
-    
+
 /**
  * Returns the maximum number of streaming channels that can be created.
  * @return Maximum streaming channels.
@@ -478,7 +500,7 @@ public class SoundSystemConfig
     {
         return numberStreamingChannels;
     }
-    
+
 /**
  * Sets the varriable used for overall volume, affecting all sources.
  * @param value Float value (0.0f - 1.0f).
@@ -487,7 +509,7 @@ public class SoundSystemConfig
     {
         masterGain = value;
     }
-    
+
 /**
  * Returns the value for the overall volume.
  * @return A float value (0.0f - 1.0f).
@@ -498,7 +520,7 @@ public class SoundSystemConfig
     }
 
 /**
- * Sets the default attenuation model to use when one is not specified. 
+ * Sets the default attenuation model to use when one is not specified.
  * Attenuation is how a source's volume fades with distance.
  * @param model A global attenuation model identifier.
  */
@@ -660,9 +682,9 @@ public class SoundSystemConfig
     }
 
 /**
- * Sets the maximum number of bytes to read in for (non-streaming) files.  
- * Increase this value if non-streaming sounds are getting cut off.  
- * Decrease this value if large sound files are causing lag during load time.  
+ * Sets the maximum number of bytes to read in for (non-streaming) files.
+ * Increase this value if non-streaming sounds are getting cut off.
+ * Decrease this value if large sound files are causing lag during load time.
  * @param size Size in bytes.
  */
     public static synchronized void setMaxFileSize( int size )
@@ -670,7 +692,7 @@ public class SoundSystemConfig
         maxFileSize = size;
     }
 /**
- * Returns the maximum number of bytes to read in for (non-streaming) files.  
+ * Returns the maximum number of bytes to read in for (non-streaming) files.
  * @return Size in bytes.
  */
     public static synchronized int getMaxFileSize()
@@ -739,10 +761,10 @@ public class SoundSystemConfig
 
         if( codecs == null )
             codecs = new LinkedList<Codec>();
-        
+
         ListIterator<Codec> i = codecs.listIterator();
         Codec codec;
-        
+
         while( i.hasNext() )
         {
             codec = i.next();
@@ -879,11 +901,11 @@ public class SoundSystemConfig
             logger.errorMessage( "SoundSystemConfig", message, 0 );
     }
 
-    // We don't know what Class parameter 'c' is, so we will ignore the 
+    // We don't know what Class parameter 'c' is, so we will ignore the
     // warning message "unchecked call to getMethod".
     @SuppressWarnings("unchecked")
 /**
- * Returns the results of calling the specified method from the specified 
+ * Returns the results of calling the specified method from the specified
  * class using the specified parameters.
  * @param c Class to call the method on.
  * @param method Name of the method.

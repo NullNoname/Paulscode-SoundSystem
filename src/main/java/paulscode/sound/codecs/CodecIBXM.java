@@ -3,17 +3,16 @@ package paulscode.sound.codecs;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
-import paulscode.sound.PAudioFormat;
 
+import paulscode.sound.FilenameURL;
+import paulscode.sound.PAudioFormat;
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemLogger;
-
 import ibxm.FastTracker2;
 import ibxm.IBXM;
 import ibxm.Module;
@@ -219,17 +218,17 @@ public class CodecIBXM implements ICodec
 /**
  * Prepares an audio stream to read from.  If another stream is already opened,
  * it will be closed and a new audio stream opened in its place.
- * @param url URL to an audio file to stream from.
+ * @param filenameURL FilenameURL to an audio file to stream from.
  * @return False if an error occurred or if end of stream was reached.
  */
-    public boolean initialize( URL url )
+    public boolean initialize( FilenameURL filenameURL )
     {
         initialized( SET, false );
         cleanup();
 
-        if( url == null )
+        if( filenameURL == null )
         {
-            errorMessage( "url null in method 'initialize'" );
+            errorMessage( "filenameURL null in method 'initialize'" );
             cleanup();
             return false;
         }
@@ -238,7 +237,7 @@ public class CodecIBXM implements ICodec
 
         try
         {
-            is = url.openStream();
+            is = filenameURL.openStream();
         }
         catch( IOException ioe )
         {

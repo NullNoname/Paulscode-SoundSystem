@@ -273,7 +273,7 @@ public class SourceLWJGLOpenAL extends Source
                 {
                     codec.reverseByteOrder( true );
                     if( codec.getAudioFormat() == null )
-                        codec.initialize( filenameURL.getURL() );
+                        codec.initialize( filenameURL );
 
                     AudioFormat audioFormat = AudioFormatConverter.convertAudioFormat(codec.getAudioFormat());
 
@@ -616,7 +616,7 @@ public class SourceLWJGLOpenAL extends Source
                     return;
                 }
                 if( codec.getAudioFormat() == null )
-                    codec.initialize( filenameURL.getURL() );
+                    codec.initialize( filenameURL );
 
                 AudioFormat audioFormat = AudioFormatConverter.convertAudioFormat(codec.getAudioFormat());
 
@@ -687,7 +687,7 @@ public class SourceLWJGLOpenAL extends Source
         if( codec == null )
             return false;
 
-        codec.initialize( filenameURL.getURL() );
+        codec.initialize( filenameURL );
         LinkedList<byte[]> preLoadBuffers = new LinkedList<byte[]>();
         for( int i = 0; i < SoundSystemConfig.getNumberStreamingBuffers(); i++ )
         {

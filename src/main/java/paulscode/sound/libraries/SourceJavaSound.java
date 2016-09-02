@@ -362,7 +362,7 @@ public class SourceJavaSound extends Source
         }
         else
         {
-            codec.initialize( filenameURL.getURL() );
+            codec.initialize( filenameURL );
 
             for( int i = 0; i < SoundSystemConfig.getNumberStreamingBuffers(); i++ )
             {

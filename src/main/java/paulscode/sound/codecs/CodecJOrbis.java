@@ -2,10 +2,8 @@ package paulscode.sound.codecs;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownServiceException;
 import paulscode.sound.PAudioFormat;
+
 
 // From the JOrbis library, http://www.jcraft.com/jorbis/
 import com.jcraft.jogg.Packet;
@@ -17,6 +15,7 @@ import com.jcraft.jorbis.Block;
 import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.Info;
 
+import paulscode.sound.FilenameURL;
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
@@ -85,16 +84,6 @@ public class CodecJOrbis implements ICodec
  * is not aplicable.
  */
     private static final boolean XXX = false;
-
-/**
- * URL to the audio file to stream from.
- */
-    private URL url;
-
-/**
- * Used for connecting to the URL.
- */
-    private URLConnection urlConnection = null;
 
 /**
  * InputStream context for reading data from the file.
@@ -212,10 +201,10 @@ public class CodecJOrbis implements ICodec
 /**
  * Prepares an input stream to read from.  If another stream is already opened,
  * it will be closed and a new input stream opened in its place.
- * @param url URL to an ogg file to stream from.
+ * @param filenameURL FilenameURL to an ogg file to stream from.
  * @return False if an error occurred or if end of stream was reached.
  */
-    public boolean initialize( URL url )
+    public boolean initialize( FilenameURL filenameURL )
     {
         initialized( SET, false );
 
@@ -230,7 +219,7 @@ public class CodecJOrbis implements ICodec
         if( joggSyncState != null )
             joggSyncState.clear();
 
-    	if( inputStream != null )
+        if( inputStream != null )
         {
             try
             {
@@ -240,7 +229,6 @@ public class CodecJOrbis implements ICodec
             {}
         }
 
-        this.url = url;
         //this.bufferSize = SoundSystemConfig.getStreamingBufferSize() / 2;
         this.bufferSize = 4096*2;
 
@@ -256,38 +244,15 @@ public class CodecJOrbis implements ICodec
 
         try
         {
-            urlConnection = url.openConnection();
-        }
-        catch( UnknownServiceException use )
-        {
-            errorMessage( "Unable to create a UrlConnection in method " +
-              "'initialize'." );
-            printStackTrace( use );
-            cleanup();
-            return false;
+            inputStream = filenameURL.openStream();
         }
         catch( IOException ioe )
         {
-            errorMessage( "Unable to create a UrlConnection in method " +
+            errorMessage( "Unable to acquire inputstream in method " +
                           "'initialize'." );
             printStackTrace( ioe );
             cleanup();
             return false;
-        }
-        if( urlConnection != null )
-        {
-            try
-            {
-                inputStream = urlConnection.getInputStream();
-            }
-            catch( IOException ioe )
-            {
-                errorMessage( "Unable to acquire inputstream in method " +
-                              "'initialize'." );
-                printStackTrace( ioe );
-                cleanup();
-                return false;
-            }
         }
 
         endOfStream( SET, false );

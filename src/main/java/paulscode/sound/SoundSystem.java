@@ -146,6 +146,10 @@ public class SoundSystem
             logger = new SoundSystemLogger();
             SoundSystemConfig.setLogger( logger );
         }
+        // if the user didn't create a file input provider, create the default one:
+        if(SoundSystemConfig.getFileInputProvider() == null) {
+            SoundSystemConfig.setFileInputProvider(new DefaultFileInputProvider());
+        }
 
         linkDefaultLibrariesAndCodecs();
 
@@ -195,6 +199,10 @@ public class SoundSystem
         {
             logger = new SoundSystemLogger();
             SoundSystemConfig.setLogger( logger );
+        }
+        // if the user didn't create a file input provider, create the default one:
+        if(SoundSystemConfig.getFileInputProvider() == null) {
+            SoundSystemConfig.setFileInputProvider(new DefaultFileInputProvider());
         }
         linkDefaultLibrariesAndCodecs();
 

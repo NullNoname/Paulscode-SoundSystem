@@ -300,7 +300,7 @@ public class LibraryJavaSound extends Library
                                      "' in method 'loadSound'" ) )
             return false;
 
-        codec.initialize( url );
+        codec.initialize( filenameURL );
         SoundBuffer buffer = codec.readAll();
         codec.cleanup();
         codec = null;

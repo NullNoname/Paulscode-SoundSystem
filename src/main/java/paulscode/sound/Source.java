@@ -664,7 +664,7 @@ public class Source
                     nextCodec.cleanup();
                 nextCodec = SoundSystemConfig.getCodec(
                                     soundSequenceQueue.get( 0 ).getFilename() );
-                nextCodec.initialize( soundSequenceQueue.get( 0 ).getURL() );
+                nextCodec.initialize( soundSequenceQueue.get( 0 ) );
 
                 SoundBuffer buffer = null;
                 for( int i = 0;
@@ -973,7 +973,7 @@ public class Source
                                 filenameURL = soundSequenceQueue.remove( 0 );
                                 codec = SoundSystemConfig.getCodec(
                                                         filenameURL.getFilename() );
-                                codec.initialize( filenameURL.getURL() );
+                                codec.initialize( filenameURL );
                                 buffer = codec.read();
                                 if( buffer != null )
                                 {
@@ -986,7 +986,7 @@ public class Source
                             }
                             else if( toLoop )
                             {
-                                codec.initialize( filenameURL.getURL() );
+                                codec.initialize( filenameURL );
                                 buffer = codec.read();
                                 if( buffer != null )
                                 {
@@ -1085,7 +1085,7 @@ public class Source
             nextCodec = null;
             URL url = filenameURL.getURL();
 
-            codec.initialize( url );
+            codec.initialize( filenameURL );
             for( int i = 0; i < SoundSystemConfig.getNumberStreamingBuffers();
                  i++ )
             {
