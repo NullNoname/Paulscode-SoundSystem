@@ -18,9 +18,9 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 
 /**
- * The MidiChannel class provides an interface for playing MIDI files, using 
- * the JavaSound API.  For more information about the JavaSound API, visit 
- * http://java.sun.com/products/java-media/sound/ 
+ * The MidiChannel class provides an interface for playing MIDI files, using
+ * the JavaSound API.  For more information about the JavaSound API, visit
+ * http://java.sun.com/products/java-media/sound/
  *<br><br>
  *<b><i>    SoundSystem License:</b></i><br><b><br>
  *    You are free to use this library for any purpose, commercial or otherwise.
@@ -60,50 +60,50 @@ public class MidiChannel implements MetaEventListener
  * Processes status messages, warnings, and error messages.
  */
     private SoundSystemLogger logger;
-    
+
 /**
  * Filename/URL to the file:
  */
     private FilenameURL filenameURL;
-    
+
 /**
  * Unique source identifier for this MIDI source.
  */
     private String sourcename;
-    
+
 /**
  * Global identifier for the MIDI "change volume" event.
  */
     private static final int CHANGE_VOLUME = 7;
-    
+
 /**
  * Global identifier for the MIDI "end of track" event.
  */
     private static final int END_OF_TRACK = 47;
-    
+
 /**
- * Used to return a current value from one of the synchronized 
+ * Used to return a current value from one of the synchronized
  * boolean-interface methods.
  */
     private static final boolean GET = false;
-    
+
 /**
  * Used to set the value in one of the synchronized boolean-interface methods.
  */
     private static final boolean SET = true;
-    
+
 /**
- * Used when a parameter for one of the synchronized boolean-interface methods 
+ * Used when a parameter for one of the synchronized boolean-interface methods
  * is not aplicable.
  */
     private static final boolean XXX = false;
-    
+
 /**
- * Runs the assigned sequence, passing information on to the synthesizer for 
+ * Runs the assigned sequence, passing information on to the synthesizer for
  * playback.
  */
     private Sequencer sequencer = null;
-    
+
 /**
  * Converts MIDI events into audio.
  */
@@ -113,27 +113,27 @@ public class MidiChannel implements MetaEventListener
  * Converts MIDI events into audio if there is no default Synthesizer.
  */
     private MidiDevice synthDevice = null;
-    
+
 /**
  * Sequence of MIDI events defining sound.
  */
     private Sequence sequence = null;
-    
+
 /**
  * Should playback loop or play only once.
  */
     private boolean toLoop = true;
-    
+
 /**
  * Playback volume, float value (0.0f - 1.0f).
  */
     private float gain = 1.0f;
-    
+
 /**
  * True while sequencer is busy being set up.
  */
     private boolean loading = true;
-    
+
 /**
  * The list of MIDI files to play when the current sequence finishes.
  */
@@ -143,7 +143,7 @@ public class MidiChannel implements MetaEventListener
  * Ensures that only one thread accesses the sequenceQueue at a time.
  */
     private final Object sequenceQueueLock = new Object();
-    
+
 /**
  * Specifies the gain factor used for the fade-out effect, or -1 when
  * playback is not currently fading out.
@@ -189,7 +189,7 @@ public class MidiChannel implements MetaEventListener
 
         // grab a handle to the message logger:
         logger = SoundSystemConfig.getLogger();
-        
+
         // save information about the source:
         filenameURL( SET, new FilenameURL( filename ) );
         sourcename( SET, sourcename );
@@ -266,9 +266,9 @@ public class MidiChannel implements MetaEventListener
     {
         // Load a sequencer:
         getSequencer();
-        
+
         // Load the sequence to play:
-        setSequence( filenameURL( GET, null).getURL() );
+        setSequence( filenameURL( GET, null) );
 
         // Load a synthesizer to play the sequence on:
         getSynthesizer();
@@ -285,7 +285,7 @@ public class MidiChannel implements MetaEventListener
     {
         loading( SET, true );
         setLooping( true );
-        
+
         if( sequencer != null )
         {
             try
@@ -297,7 +297,7 @@ public class MidiChannel implements MetaEventListener
             catch( Exception e )
             {}
         }
-        
+
         logger = null;
         sequencer = null;
         synthesizer = null;
@@ -309,7 +309,7 @@ public class MidiChannel implements MetaEventListener
                 sequenceQueue.clear();
             sequenceQueue = null;
         }
-        
+
         // End the fade effects thread if it exists:
         if( fadeThread != null )
         {
@@ -344,10 +344,10 @@ public class MidiChannel implements MetaEventListener
         }
 
         fadeThread = null;
-        
+
         loading( SET, false );
     }
-    
+
 /**
  * Queues up the next MIDI sequence to play when the previous sequence ends.
  * @param filenameURL MIDI sequence to play next.
@@ -606,12 +606,12 @@ public class MidiChannel implements MetaEventListener
 
                     // Finished loading:
                     loading( SET, false );
-                    
+
                     // failure:
                     return false;
                 }
                 // set the new sequence to be played:
-                setSequence( filenameURL( GET, null ).getURL() );
+                setSequence( filenameURL( GET, null ) );
                 // start playing again:
                 sequencer.start();
                 // make sure we play at the correct volume:
@@ -627,13 +627,13 @@ public class MidiChannel implements MetaEventListener
                 return true;
             }
         }
-        
+
         // Nothing left to load
         return false;
     }
 
 /**
- * Plays the MIDI file from the beginning, or from where it left off if it was 
+ * Plays the MIDI file from the beginning, or from where it left off if it was
  * paused.
  */
     public void play()
@@ -661,7 +661,7 @@ public class MidiChannel implements MetaEventListener
             }
         }
     }
-    
+
 /**
  * Stops playback and rewinds to the beginning.
  */
@@ -692,7 +692,7 @@ public class MidiChannel implements MetaEventListener
             }
         }
     }
-    
+
 /**
  * Temporarily stops playback without rewinding.
  */
@@ -719,7 +719,7 @@ public class MidiChannel implements MetaEventListener
             }
         }
     }
-    
+
 /**
  * Returns playback to the beginning.
  */
@@ -746,7 +746,7 @@ public class MidiChannel implements MetaEventListener
             }
         }
     }
-    
+
 /**
  * Changes the volume of MIDI playback.
  * @param value Float value (0.0f - 1.0f).
@@ -756,7 +756,7 @@ public class MidiChannel implements MetaEventListener
         gain = value;
         resetGain();
     }
-    
+
 /**
  * Returns the current volume for the MIDI source.
  * @return Float value (0.0f - 1.0f).
@@ -765,7 +765,7 @@ public class MidiChannel implements MetaEventListener
     {
         return gain;
     }
-    
+
 /**
  * Changes the basic information about the MIDI source.  This method removes
  * any queued filenames/URLs from the list of MIDI sequences that would have
@@ -854,7 +854,7 @@ public class MidiChannel implements MetaEventListener
             if( sequenceQueue != null )
                 sequenceQueue.clear();
         }
-        
+
         // Check if we have a sequencer:
         if( sequencer == null )
         {
@@ -882,7 +882,7 @@ public class MidiChannel implements MetaEventListener
         }
 
         // set the new sequence to be played:
-        setSequence( filenameURL( GET, null ).getURL() );
+        setSequence( filenameURL( GET, null ) );
         // start playing again:
         sequencer.start();
         // make sure we play at the correct volume:
@@ -900,7 +900,7 @@ public class MidiChannel implements MetaEventListener
     {
         toLoop( SET, value );
     }
-    
+
 /**
  * Returns the value of boolean 'toLoop'.
  * @return True while looping.
@@ -909,7 +909,7 @@ public class MidiChannel implements MetaEventListener
     {
         return toLoop( GET, XXX );
     }
-    
+
 /**
  * Sets or returns the value of boolean 'toLoop'.
  * @param action GET or SET.
@@ -922,7 +922,7 @@ public class MidiChannel implements MetaEventListener
             toLoop = value;
         return toLoop;
     }
-    
+
 /**
  * Check if a MIDI file is in the process of loading.
  */
@@ -930,7 +930,7 @@ public class MidiChannel implements MetaEventListener
     {
         return( loading( GET, XXX ) );
     }
-    
+
 /**
  * Sets or returns the value of boolean 'loading'.
  * @param action GET or SET.
@@ -943,7 +943,7 @@ public class MidiChannel implements MetaEventListener
             loading = value;
         return loading;
     }
-    
+
 /**
  * Defines the unique identifier for this source
  * @param value New source name.
@@ -952,7 +952,7 @@ public class MidiChannel implements MetaEventListener
     {
         sourcename( SET, value );
     }
-    
+
 /**
  * Returns the unique identifier for this source.
  * @return The source's name.
@@ -961,7 +961,7 @@ public class MidiChannel implements MetaEventListener
     {
         return sourcename( GET, null );
     }
-    
+
 /**
  * Sets or returns the value of String 'sourcename'.
  * @param action GET or SET.
@@ -974,7 +974,7 @@ public class MidiChannel implements MetaEventListener
             sourcename = value;
         return sourcename;
     }
-    
+
 /**
  * Defines which MIDI file to play.
  * @param value Path to the MIDI file.
@@ -983,7 +983,7 @@ public class MidiChannel implements MetaEventListener
     {
         filenameURL( SET, value );
     }
-    
+
 /**
  * Returns the filename/identifier of the MIDI file being played.
  * @return Filename of identifier of the MIDI file.
@@ -1001,7 +1001,7 @@ public class MidiChannel implements MetaEventListener
     {
         return filenameURL( GET, null );
     }
-    
+
 /**
  * Sets or returns the value of filenameURL.
  * @param action GET or SET.
@@ -1015,7 +1015,7 @@ public class MidiChannel implements MetaEventListener
             filenameURL = value;
         return filenameURL;
     }
-    
+
 /**
  * Called when MIDI events occur.
  * @param message Meta mssage describing the MIDI event.
@@ -1097,7 +1097,7 @@ public class MidiChannel implements MetaEventListener
             }
         }
     }
-    
+
 /**
  * Resets playback volume to the correct level.
  */
@@ -1108,9 +1108,9 @@ public class MidiChannel implements MetaEventListener
             gain = 0.0f;
         if( gain > 1.0f )
             gain = 1.0f;
-        
+
         int midiVolume = (int) ( gain * SoundSystemConfig.getMasterGain()
-                                 * (float) Math.abs( fadeOutGain ) * fadeInGain
+                                 * Math.abs( fadeOutGain ) * fadeInGain
                                  * 127.0f );
         if( synthesizer != null )
         {
@@ -1249,9 +1249,9 @@ public class MidiChannel implements MetaEventListener
  * Loads the MIDI sequence form the specified URL, and sets the sequence.  If
  * variable 'sequencer' is null or an error occurs, then variable 'sequence'
  * remains null.
- * @param midiSource URL to a MIDI file.
+ * @param filenameURL FilenameURL to a MIDI file.
  */
-    private void setSequence( URL midiSource )
+    private void setSequence( FilenameURL filenameURL )
     {
         if( sequencer == null )
         {
@@ -1261,7 +1261,7 @@ public class MidiChannel implements MetaEventListener
             return;
         }
 
-        if( midiSource == null )
+        if( filenameURL == null )
         {
             errorMessage( "Unable to load Midi file in method 'setSequence'." );
             return;
@@ -1269,7 +1269,7 @@ public class MidiChannel implements MetaEventListener
 
         try
         {
-            sequence = MidiSystem.getSequence( midiSource );
+            sequence = MidiSystem.getSequence( filenameURL.openStream() );
         }
         catch( IOException ioe )
         {
@@ -1522,7 +1522,7 @@ public class MidiChannel implements MetaEventListener
         message( "    MIDI device not found" );
         return null;
     }
-    
+
 /**
  * Prints a message.
  * @param message Message to print.
@@ -1531,7 +1531,7 @@ public class MidiChannel implements MetaEventListener
     {
         logger.message( message, 0 );
     }
-    
+
 /**
  * Prints an important message.
  * @param message Message to print.
@@ -1540,7 +1540,7 @@ public class MidiChannel implements MetaEventListener
     {
         logger.importantMessage( message, 0 );
     }
-    
+
 /**
  * Prints the specified message if error is true.
  * @param error True or False.
@@ -1551,7 +1551,7 @@ public class MidiChannel implements MetaEventListener
     {
         return logger.errorCheck( error, "MidiChannel", message, 0 );
     }
-    
+
 /**
  * Prints an error message.
  * @param message Message to print.
@@ -1560,7 +1560,7 @@ public class MidiChannel implements MetaEventListener
     {
         logger.errorMessage( "MidiChannel", message, 0 );
     }
-    
+
 /**
  * Prints an exception's error message followed by the stack trace.
  * @param e Exception containing the information to print.
@@ -1578,7 +1578,7 @@ public class MidiChannel implements MetaEventListener
     {
         @Override
 /**
- * Runs in the background, timing fade in and fade out, changing the sequence, 
+ * Runs in the background, timing fade in and fade out, changing the sequence,
  * and issuing the appropriate volume change messages.
  */
         public void run()
@@ -1596,6 +1596,6 @@ public class MidiChannel implements MetaEventListener
             cleanup();
         }
     }
-    
+
 }
 
