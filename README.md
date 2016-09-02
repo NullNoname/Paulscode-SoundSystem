@@ -4,7 +4,10 @@ Most optional components except JOAL and jPCT-related codes are included.
 
 This port still works in PC, and this repository contain nothing for Android. To actually being able to play audio in Android, you will need to use [LibraryAudioTrack](https://github.com/NullNoname/paudiotrack).
 
-This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
+## Changes from the original
+* This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
+* FileInputProvider and DefaultFileInputProvider classes are added. They can be implemented or extended to feed your own InputStream to the system. These are useful for loading files from Android assets. Use SoundSystemConfig.setFileInputProvider(FileInputProvider) to set your own implementation.
+* Added sample rate setting (setDefaultSampleRate) to CodecIBXM.
 
 ## Android Codec Compatibility
 * CodecJOrbis: Works
@@ -105,7 +108,7 @@ Required for loading Speex audio though CodecJSpeex.
 
 * PAudioFormat is a modified class of AudioFormat from Apache Harmony. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same codebase. PAudioFormat is licensed under Apache License Version 2.0. Please see "PAudioFormat License.txt" for more information.
 
-* AudioFormatConverter class is licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
+* AudioFormatConverter, FileInputProvider, and DefaultFileInputProvider classes are licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
 
 * LWJGL related codes (ChannelLWJGLOpenAL, LibraryLWJGLOpenAL, and SourceLWJGLOpenAL) are licensed under SoundSystem LibraryLWJGLOpenAL License. Please see "SoundSystem LibraryLWJGLOpenAL License.txt" and "LWJGL License.txt" for more information.
 
