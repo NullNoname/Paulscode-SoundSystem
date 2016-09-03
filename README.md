@@ -4,6 +4,8 @@ Most optional components except JOAL and jPCT-related codes are included.
 
 This port still works in PC, and this repository contain nothing for Android. To actually being able to play audio in Android, you will need to use [LibraryAudioTrack](https://github.com/NullNoname/paudiotrack).
 
+An example application can be found in [pc3dssdemo](https://github.com/NullNoname/pc3dssdemo) repository.
+
 ## Changes from the original
 * This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
 * FileInputProvider and DefaultFileInputProvider classes are added. They can be implemented or extended to feed your own InputStream to the system. These are useful for loading files from Android assets. Use SoundSystemConfig.setFileInputProvider(FileInputProvider) to set your own implementation.
