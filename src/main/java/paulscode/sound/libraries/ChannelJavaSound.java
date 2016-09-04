@@ -835,37 +835,44 @@ public class ChannelJavaSound extends Channel
  * Plays the currently attached normal source, opens this channel up for
  * streaming, or resumes playback if this channel was paused.
  */
-    @Override
-    public void play()
-    {
-        switch( channelType )
-        {
-            case SoundSystemConfig.TYPE_NORMAL:
-                if( clip != null )
-                {
-                    if( toLoop )
-                    {
-                        clip.stop();
-                        clip.loop( Clip.LOOP_CONTINUOUSLY );
-                    }
-                    else
-                    {
-                        clip.stop();
-                        clip.start();
-                    }
-
-                }
-                break;
-            case SoundSystemConfig.TYPE_STREAMING:
-                if( sourceDataLine != null )
-                {
-                    sourceDataLine.start();
-                }
-                break;
-            default:
-                break;
-        }
-    }
+	@Override
+	public void play() {
+		switch(channelType) {
+			case SoundSystemConfig.TYPE_NORMAL:
+				if(clip != null) {
+					if(toLoop) {
+						try {
+							clip.stop();
+							clip.loop(Clip.LOOP_CONTINUOUSLY);
+						} catch (Exception e) {
+							errorMessage("Error loop()ing the clip");
+							printStackTrace(e);
+						}
+					} else {
+						try {
+							clip.stop();
+							clip.start();
+						} catch (Exception e) {
+							errorMessage("Error start()ing the clip");
+							printStackTrace(e);
+						}
+					}
+				}
+				break;
+			case SoundSystemConfig.TYPE_STREAMING:
+				if(sourceDataLine != null) {
+					try {
+						sourceDataLine.start();
+					} catch (Exception e) {
+						errorMessage("Error start()ing the sourceDataLine");
+						printStackTrace(e);
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
 
 /**
  * Temporarily stops playback for this channel.
