@@ -127,6 +127,8 @@ Required for loading Speex audio though CodecJSpeex.
 
 * PAudioFormat is a modified class of AudioFormat from Apache Harmony. It also contains the "NOT_SPECIFIED" constant from AudioSystem from the same codebase. PAudioFormat is licensed under Apache License Version 2.0. Please see "PAudioFormat License.txt" for more information.
 
+* LittleEndianDataInputStream is based on [a blog post by Peter Franza](http://www.peterfranza.com/2008/09/26/little-endian-input-stream/).
+
 * AudioFormatConverter, FileInputProvider, and DefaultFileInputProvider classes are licensed under Unlicense. Please see "AudioFormatConverter License.txt" for more information.
 
 * LWJGL related codes (ChannelLWJGLOpenAL, LibraryLWJGLOpenAL, and SourceLWJGLOpenAL) are licensed under SoundSystem LibraryLWJGLOpenAL License. Please see "SoundSystem LibraryLWJGLOpenAL License.txt" and "LWJGL License.txt" for more information.
