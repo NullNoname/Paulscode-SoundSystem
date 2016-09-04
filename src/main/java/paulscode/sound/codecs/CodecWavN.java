@@ -219,7 +219,7 @@ public class CodecWavN implements ICodec {
 				total += read;
 			}
 		} catch (IOException e) {
-			errorMessage("Exception thrown while reading from the " + "LittleEndianDataInputStream.");
+			errorMessage("Exception thrown while reading from the LittleEndianDataInputStream.");
 			printStackTrace(e);
 			return null;
 		}
@@ -259,7 +259,7 @@ public class CodecWavN implements ICodec {
 		}
 
 		int totalFileSizeMinus8 = ledin.readInt();
-		message("Wav file size:" + (totalFileSizeMinus8 + 8));
+		//message("Wav file size:" + (totalFileSizeMinus8 + 8));
 
 		// Check WAVE header
 		int wave = ledin.readInt();
@@ -277,28 +277,15 @@ public class CodecWavN implements ICodec {
 			if(chunkID == 0x20746D66) {
 				//message("fmt chunkSize:" + chunkSize);
 				short compressionFormat = ledin.readShort();
+				if(compressionFormat != 1) throw new IOException("Unsupported Wave Compression Format (" + compressionFormat + ")");
 				short channels = ledin.readShort();
 				int sampleRate = ledin.readInt();
 				int bytesPerSecond = ledin.readInt();
 				short frameSize = ledin.readShort();
 				short sampleSizeInBits = ledin.readShort();
-				/*
-				message("compressionFormat:" + compressionFormat);
-				message("channels:" + channels);
-				message("sampleRate:" + sampleRate);
-				message("bytesPerSecond:" + bytesPerSecond);
-				message("frameSize:" + frameSize);
-				message("sampleSizeInBits:" + sampleSizeInBits);
-				*/
 
 				PAudioFormat.Encoding encoding = PAudioFormat.Encoding.PCM_SIGNED;
-				if(compressionFormat == 6) {
-					encoding = PAudioFormat.Encoding.ALAW;
-				} else if(compressionFormat == 7) {
-					encoding = PAudioFormat.Encoding.ULAW;
-				} else if(sampleSizeInBits == 8) {
-					encoding = PAudioFormat.Encoding.PCM_UNSIGNED;
-				}
+				if(sampleSizeInBits == 8) encoding = PAudioFormat.Encoding.PCM_UNSIGNED;
 
 				myAudioFormat = new PAudioFormat(encoding, sampleRate, sampleSizeInBits, channels, frameSize, bytesPerSecond/frameSize, false);
 
@@ -317,7 +304,7 @@ public class CodecWavN implements ICodec {
 			}
 			// ????
 			else {
-				message("Skipping an unknown chunk (0x" + Integer.toHexString(wave).toUpperCase() + ") for " + chunkSize + " bytes");
+				message("Skipping an unknown chunk (0x" + Integer.toHexString(chunkID).toUpperCase() + ") for " + chunkSize + " bytes");
 				ledin.skipBytes(chunkSize);
 			}
 		}
@@ -370,88 +357,9 @@ public class CodecWavN implements ICodec {
 	}
 
 	/**
-	 * Creates a new array with the second array appended to the end of the first
-	 * array.
-	 * @param arrayOne The first array.
-	 * @param arrayTwo The second array.
-	 * @param arrayTwoBytes The number of bytes to append from the second array.
-	 * @return Byte array containing information from both arrays.
+	 * Close a Closeable, ignoring any Exceptions
+	 * @param c Closeable
 	 */
-	private static byte[] appendByteArrays(byte[] arrayOne, byte[] arrayTwo, int arrayTwoBytes) {
-		byte[] newArray;
-		int bytes = arrayTwoBytes;
-
-		// Make sure we aren't trying to append more than is there:
-		if(arrayTwo == null || arrayTwo.length == 0)
-			bytes = 0;
-		else if(arrayTwo.length < arrayTwoBytes)
-			bytes = arrayTwo.length;
-
-		if(arrayOne == null && (arrayTwo == null || bytes <= 0)) {
-			// no data, just return
-			return null;
-		} else if(arrayOne == null) {
-			// create the new array, same length as arrayTwo:
-			newArray = new byte[bytes];
-			// fill the new array with the contents of arrayTwo:
-			System.arraycopy(arrayTwo, 0, newArray, 0, bytes);
-			arrayTwo = null;
-		} else if(arrayTwo == null || bytes <= 0) {
-			// create the new array, same length as arrayOne:
-			newArray = new byte[arrayOne.length];
-			// fill the new array with the contents of arrayOne:
-			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
-			arrayOne = null;
-		} else {
-			// create the new array large enough to hold both arrays:
-			newArray = new byte[arrayOne.length + bytes];
-			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
-			// fill the new array with the contents of both arrays:
-			System.arraycopy(arrayTwo, 0, newArray, arrayOne.length, bytes);
-			arrayOne = null;
-			arrayTwo = null;
-		}
-
-		return newArray;
-	}
-
-	/**
-	 * Creates a new array with the second array appended to the end of the first
-	 * array.
-	 * @param arrayOne The first array.
-	 * @param arrayTwo The second array.
-	 * @return Byte array containing information from both arrays.
-	 */
-	private static byte[] appendByteArrays(byte[] arrayOne, byte[] arrayTwo) {
-		byte[] newArray;
-		if(arrayOne == null && arrayTwo == null) {
-			// no data, just return
-			return null;
-		} else if(arrayOne == null) {
-			// create the new array, same length as arrayTwo:
-			newArray = new byte[arrayTwo.length];
-			// fill the new array with the contents of arrayTwo:
-			System.arraycopy(arrayTwo, 0, newArray, 0, arrayTwo.length);
-			arrayTwo = null;
-		} else if(arrayTwo == null) {
-			// create the new array, same length as arrayOne:
-			newArray = new byte[arrayOne.length];
-			// fill the new array with the contents of arrayOne:
-			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
-			arrayOne = null;
-		} else {
-			// create the new array large enough to hold both arrays:
-			newArray = new byte[arrayOne.length + arrayTwo.length];
-			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
-			// fill the new array with the contents of both arrays:
-			System.arraycopy(arrayTwo, 0, newArray, arrayOne.length, arrayTwo.length);
-			arrayOne = null;
-			arrayTwo = null;
-		}
-
-		return newArray;
-	}
-
 	private static void closeQuietly(Closeable c) {
 		try {c.close();} catch (Exception e) {}
 	}
