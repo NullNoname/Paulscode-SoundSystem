@@ -18,6 +18,23 @@ An example application can be found in [pc3dssdemo](https://github.com/NullNonam
 * CodecWav: Not ported to Android because it has heavy usage of JavaSound API.
 * CodecJOgg: Same as CodecWav. Need JavaSound to work.
 * MIDI: Don't even try. I'm sure it will crash and burn.
+
+## Getting this library from JitPack
+Add the JitPack repository to your pom.xml, and add a dependency.
+```
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.NullNoname</groupId>
+    <artifactId>Paulscode-SoundSystem</artifactId>
+    <version>droid3</version>
+</dependency>
+```
  
 ## External Dependencies
 ### LWJGL (PC only)
