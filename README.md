@@ -9,13 +9,15 @@ An example application can be found in [pc3dssdemo](https://github.com/NullNonam
 ## Changes from the original
 * This port added "PAudioFormat" class which is a clone of JavaSound's AudioFormat. AudioFormat is missing from Android but was used by several places in 3D Sound System. This port also added "AudioFormatConverter" class which converts between our PAudioFormat and the real AudioFormat.
 * FileInputProvider and DefaultFileInputProvider classes are added. They can be implemented or extended to feed your own InputStream to the system. These are useful for loading files from Android assets. Use SoundSystemConfig.setFileInputProvider(FileInputProvider) to set your own implementation.
+* Added CodecWavN is added which loads .wav files without using JavaSound.
 * Added sample rate setting (setDefaultSampleRate) to CodecIBXM.
+* Song loop now works in JavaSound.
 
 ## Android Codec Compatibility
 * CodecJOrbis: Works
 * CodecJSpeex: Works
 * CodecIBXM: Works
-* CodecWav: Not ported to Android because it has heavy usage of JavaSound API.
+* CodecWav: Does not work on Android because it has heavy usage of JavaSound API. Use CodecWavN instead.
 * CodecJOgg: Same as CodecWav. Need JavaSound to work.
 * MIDI: Don't even try. I'm sure it will crash and burn.
 
