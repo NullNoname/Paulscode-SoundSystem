@@ -54,7 +54,7 @@ import javax.sound.midi.Synthesizer;
  *    http://www.paulscode.com
  * </b>
  */
-public class MidiChannel implements MetaEventListener
+public class MidiChannel implements IMidiChannel, MetaEventListener
 {
 /**
  * Processes status messages, warnings, and error messages.

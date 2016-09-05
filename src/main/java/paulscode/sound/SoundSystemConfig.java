@@ -118,6 +118,13 @@ public class SoundSystemConfig
     private static FileInputProvider fileInputProvider = null;
 
 /**
+ * Handle to the MIDI channel factory class, which produces an implementation of IMidiChannel interface
+ * that plays MIDI files.
+ * The default is DefaultMidiChannelFactory, which produces an instance of MidiChannel which uses JavaSound.
+ */
+    private static MidiChannelFactory midiChannelFactory = null;
+
+/**
  * List of library types in their order of priority.
  */
     private static LinkedList<Class> libraries;
@@ -429,28 +436,44 @@ public class SoundSystemConfig
  * Returns a handle to the message logger.
  * @return The current message logger.
  */
-    public static SoundSystemLogger getLogger()
-    {
-        return logger;
-    }
-
-//  STATIC SYNCHRONIZED INTERFACE METHODS
+public static SoundSystemLogger getLogger()
+{
+    return logger;
+}
 
 /**
- * Get the current IFileInputProvider to use for opening InputStream of files.
- * @return IFileInputProvider
+ * Get the current FileInputProvider to use for opening InputStream of files.
+ * @return FileInputProvider
  */
 	public static FileInputProvider getFileInputProvider() {
 		return fileInputProvider;
 	}
 
 /**
- * Changes the IFileInputProvider to use for opening InputStream of files.
- * @param fileInputProvider Handle to IFileInputProvider
+ * Changes the FileInputProvider to use for opening InputStream of files.
+ * @param fileInputProvider Handle to FileInputProvider
  */
 	public static void setFileInputProvider(FileInputProvider fileInputProvider) {
 		SoundSystemConfig.fileInputProvider = fileInputProvider;
 	}
+
+/**
+ * Get the current MidiChannelFactory
+ * @return MidiChannelFactory
+ */
+	public static MidiChannelFactory getMidiChannelFactory() {
+		return midiChannelFactory;
+	}
+
+/**
+ * Changes the MidiChannelFactory to use for playing MIDI files.
+ * @param midiChannelFactory Handle to MidiChannelFactory
+ */
+	public static void setMidiChannelFactory(MidiChannelFactory midiChannelFactory) {
+		SoundSystemConfig.midiChannelFactory = midiChannelFactory;
+	}
+
+//  STATIC SYNCHRONIZED INTERFACE METHODS
 
 /**
  * Sets the maximum number of normal (non-streaming) channels that can be

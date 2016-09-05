@@ -75,7 +75,7 @@ public class Library
 /**
  * Interface through which MIDI files can be played.
  */
-    private MidiChannel midiChannel;
+    private IMidiChannel midiChannel;
 
 /**
  * Array containing maximum number of non-streaming audio channels.
@@ -1414,7 +1414,7 @@ public class Library
 
         if( midiChannel == null )
         {
-            midiChannel = new MidiChannel( toLoop, sourcename, filenameURL );
+            midiChannel = SoundSystemConfig.getMidiChannelFactory().createMidiChannel(toLoop, sourcename, filenameURL);
         }
         else
         {
@@ -1467,7 +1467,7 @@ public class Library
  * Returns a handle to the MIDI channel, or null if one does not exist.
  * @return The MIDI channel.
  */
-    public MidiChannel getMidiChannel()
+    public IMidiChannel getMidiChannel()
     {
         return midiChannel;
     }
@@ -1477,7 +1477,7 @@ public class Library
  * Specifies the MIDI channel to use.
  * @param c New MIDI channel.
  */
-    public void setMidiChannel( MidiChannel c )
+    public void setMidiChannel( IMidiChannel c )
     {
         if( midiChannel != null && midiChannel != c )
             midiChannel.cleanup();

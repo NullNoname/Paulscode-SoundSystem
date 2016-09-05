@@ -150,6 +150,9 @@ public class SoundSystem
         if(SoundSystemConfig.getFileInputProvider() == null) {
             SoundSystemConfig.setFileInputProvider(new DefaultFileInputProvider());
         }
+        if(SoundSystemConfig.getMidiChannelFactory() == null) {
+            SoundSystemConfig.setMidiChannelFactory(new DefaultMidiChannelFactory());
+        }
 
         linkDefaultLibrariesAndCodecs();
 
@@ -204,6 +207,10 @@ public class SoundSystem
         if(SoundSystemConfig.getFileInputProvider() == null) {
             SoundSystemConfig.setFileInputProvider(new DefaultFileInputProvider());
         }
+        if(SoundSystemConfig.getMidiChannelFactory() == null) {
+            SoundSystemConfig.setMidiChannelFactory(new DefaultMidiChannelFactory());
+        }
+
         linkDefaultLibrariesAndCodecs();
 
         init( libraryClass );
@@ -1377,7 +1384,7 @@ public class SoundSystem
             ListenerData listenerData = null;
 
             boolean wasMidiChannel = false;
-            MidiChannel midiChannel = null;
+            IMidiChannel midiChannel = null;
             FilenameURL midiFilenameURL = null;
             String midiSourcename = "";
             boolean midiToLoop = true;
@@ -1454,8 +1461,7 @@ public class SoundSystem
             {
                 if( midiChannel != null )
                     midiChannel.cleanup();
-                midiChannel = new MidiChannel( midiToLoop, midiSourcename,
-                                               midiFilenameURL );
+                midiChannel = SoundSystemConfig.getMidiChannelFactory().createMidiChannel(midiToLoop, midiSourcename, midiFilenameURL);
                 soundLibrary.setMidiChannel( midiChannel );
             }
             soundLibrary.copySources( sourceMap );
