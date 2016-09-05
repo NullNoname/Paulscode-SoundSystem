@@ -50,4 +50,25 @@ public interface FileInputProvider {
 	 * @return File size in bytes, or -1 if unknown or error
 	 */
 	public int getContentLength(FilenameURL filenameURL);
+
+	/**
+	 * Get the offset where the actual content starts in the stream.
+	 * Only called and used by those weird codecs or MidiChannels that rely on it.
+	 * Unless you know what to do, return 0.
+	 * @param filenameURL FilenameURL which contains an identifier (filename) and a "URL"
+	 * @return Offset
+	 */
+	public long getContentStartOffset(FilenameURL filenameURL);
+
+	/**
+	 * Returns an instance of FileDescriptorWrapper which contains a Closeable (most likely FileInputStream on PC) and a FileDescriptor.
+	 * Most likely fail on non-local files.
+	 * Only called and used by those weird codecs or MidiChannels that rely on it.
+	 * If you are unsure, just use the default implementation of DefaultFileInputProvider.
+	 * @param filenameURL FilenameURL which contains an identifier (filename) and a "URL"
+	 * @return FileDescriptorWrapper
+	 * @throws IOException When something fails
+	 * @throws IllegalArgumentException When something fails
+	 */
+	public FileDescriptorWrapper openFileDescriptorWrapper(FilenameURL filenameURL) throws IOException;
 }

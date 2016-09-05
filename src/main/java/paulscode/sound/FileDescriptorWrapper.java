@@ -26,49 +26,67 @@
  */
 package paulscode.sound;
 
-import java.io.File;
+import java.io.Closeable;
 import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
- * Default implementation of IFileInputProvider, which just uses URL#openStream() to provide the InputStream.
+ * A pair of a Closeable and a FileDescriptor.
+ *
  * License of this class is Unlicense. For more information, please refer to http://unlicense.org/.
  * @author NullNoname
  */
-public class DefaultFileInputProvider implements FileInputProvider {
-	public InputStream openStream(FilenameURL filenameURL) throws IOException {
-		return filenameURL.getURL().openStream();
+public class FileDescriptorWrapper {
+	/** The Closeable (eg. FileInputStream) that has the FileDescriptor */
+	protected Closeable mCloseable;
+
+	/** FileDescriptor */
+	protected FileDescriptor mFileDescriptor;
+
+	/**
+	 * Constructor
+	 * @param mCloseable Closeable
+	 * @param mFileDescriptor FileDescriptor
+	 */
+	public FileDescriptorWrapper(Closeable mCloseable, FileDescriptor mFileDescriptor) {
+		this.mCloseable = mCloseable;
+		this.mFileDescriptor = mFileDescriptor;
 	}
 
-	public int getContentLength(FilenameURL filenameURL) {
+	/**
+	 * Get the Closeable (eg. FileInputStream)
+	 * @return Closeable
+	 */
+	public Closeable getCloseable() {
+		return mCloseable;
+	}
+
+	/**
+	 * Get the FileDescriptor
+	 * @return FileDescriptor
+	 */
+	public FileDescriptor getFileDescriptor() {
+		return mFileDescriptor;
+	}
+
+	/**
+	 * Close this Closeable
+	 * @throws IOException When something fails
+	 */
+	public void close() throws IOException {
+		mCloseable.close();
+	}
+
+	/**
+	 * Close this Closable, ignoring any Exceptions
+	 * @return true if successful
+	 */
+	public boolean closeQuietly() {
 		try {
-			return filenameURL.getURL().openConnection().getContentLength();
-		} catch (IOException e) {
-			return -1;
+			mCloseable.close();
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
 	}
-
-	public long getContentStartOffset(FilenameURL filenameURL) {
-		return 0;
-	}
-
-	public FileDescriptorWrapper openFileDescriptorWrapper(FilenameURL filenameURL) throws IOException {
-		URI uri = null;
-		try {
-			uri = filenameURL.getURL().toURI();
-		} catch (URISyntaxException e) {
-			throw new IOException("Could not create a valid URI from:" + filenameURL.getURL());
-		}
-
-		File file = new File(uri);
-		FileInputStream fin = new FileInputStream(file);
-		FileDescriptor fd = fin.getFD();
-
-		return new FileDescriptorWrapper(fin, fd);
-	}
-
 }
