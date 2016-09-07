@@ -57,6 +57,11 @@ public class DefaultFileInputProvider implements FileInputProvider {
 	}
 
 	public FileDescriptorWrapper openFileDescriptorWrapper(FilenameURL filenameURL) throws IOException {
+		if("file".equals(filenameURL.getURL().getProtocol()) == false) {
+			// Not a file protocol? Go away.
+			return null;
+		}
+
 		URI uri = null;
 		try {
 			uri = filenameURL.getURL().toURI();

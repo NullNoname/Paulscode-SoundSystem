@@ -153,6 +153,25 @@ public class FilenameURL
     }
 
 /**
+ * Get the offset where the actual content starts in the stream, using the current file input provider.
+ * @return Offset
+ */
+    public long getContentStartOffset() {
+        return SoundSystemConfig.getFileInputProvider().getContentStartOffset(this);
+    }
+
+/**
+ * Returns an instance of FileDescriptorWrapper which contains a Closeable (most likely FileInputStream on PC) and a FileDescriptor.
+ * Uses the current file input provider.
+ * @return FileDescriptorWrapper
+ * @throws IOException When something fails
+ * @throws IllegalArgumentException When something fails
+ */
+    public FileDescriptorWrapper openFileDescriptorWrapper() throws IOException {
+        return SoundSystemConfig.getFileInputProvider().openFileDescriptorWrapper(this);
+    }
+
+/**
  * Prints an error message.
  * @param message Message to print.
  */

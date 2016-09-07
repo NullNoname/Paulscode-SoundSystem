@@ -20,6 +20,7 @@ import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemLogger;
 
 /**
+ * <b>WARNING: NOT COMPATIBLE WITH ANDROID! Use CodecWavN instead.</b><br>
  * The CodecWav class provides an ICodec interface for reading from .wav files.
  *<br><br>
  *<b><i>   SoundSystem CodecWav License:</b></i><br><b><br>

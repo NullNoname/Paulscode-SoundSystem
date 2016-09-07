@@ -62,11 +62,11 @@ public interface FileInputProvider {
 
 	/**
 	 * Returns an instance of FileDescriptorWrapper which contains a Closeable (most likely FileInputStream on PC) and a FileDescriptor.
-	 * Most likely fail on non-local files.
+	 * Returns null if not a local file.
 	 * Only called and used by those weird codecs or MidiChannels that rely on it.
 	 * If you are unsure, just use the default implementation of DefaultFileInputProvider.
 	 * @param filenameURL FilenameURL which contains an identifier (filename) and a "URL"
-	 * @return FileDescriptorWrapper
+	 * @return FileDescriptorWrapper, or null if it is not a local file
 	 * @throws IOException When something fails
 	 * @throws IllegalArgumentException When something fails
 	 */

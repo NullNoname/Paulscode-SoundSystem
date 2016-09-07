@@ -26,6 +26,7 @@ import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemLogger;
 
 /**
+ * <b>WARNING: NOT YET COMPATIBLE WITH ANDROID!</b><br>
  * The CodecJOgg class provides an ICodec interface to the external J-Ogg
  * library.
  *<b><br><br>
