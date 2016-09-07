@@ -12,6 +12,7 @@ An example application can be found in [pc3dssdemo](https://github.com/NullNonam
 * Added CodecWavN is added which loads .wav files without using JavaSound.
 * Added sample rate setting (setDefaultSampleRate) to CodecIBXM.
 * Song loop now works in JavaSound.
+* Added IMidiChannel, MidiChannelFactory, and DefaultMidiChannelFactory classes which you can implement or extend to provide your own MIDI player backend.
 
 ## Android Codec Compatibility
 * CodecJOrbis: Works
@@ -19,7 +20,7 @@ An example application can be found in [pc3dssdemo](https://github.com/NullNonam
 * CodecIBXM: Works
 * CodecWav: Does not work on Android because it has heavy usage of JavaSound API. Use CodecWavN instead.
 * CodecJOgg: Same as CodecWav. Need JavaSound to work.
-* MIDI: Don't even try. I'm sure it will crash and burn.
+* MIDI: The default JavaSound one will crash and burn. LibraryAudioTrack has a primitive MIDI backend that uses Android MediaPlayer: ```SoundSystemConfig.setMidiChannelFactory(new MPMidiChannelFactory());```
 
 ## Getting this library from JitPack
 Add the JitPack repository to your pom.xml, and add a dependency.
@@ -34,10 +35,27 @@ Add the JitPack repository to your pom.xml, and add a dependency.
 <dependency>
     <groupId>com.github.NullNoname</groupId>
     <artifactId>Paulscode-SoundSystem</artifactId>
-    <version>droid3</version>
+    <version>droid4</version>
 </dependency>
 ```
- 
+
+If you are using Gradle, you need to specify both JCenter and JitPack in the repositories section of the gradle file of the Application side:
+```
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile 'com.github.NullNoname:Paulscode-SoundSystem:droid4'
+    compile 'com.github.NullNoname:paudiotrack:1.1'
+}
+```
+
 ## External Dependencies
 ### LWJGL (PC only)
 Required for playing sound through LibraryLWJGLOpenAL.
